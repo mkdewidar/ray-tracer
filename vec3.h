@@ -40,6 +40,10 @@ struct Vec3 {
     Vec3 unit() const {
         return *this / this->length();
     }
+
+    double dot(Vec3 const & right) const {
+        return (this->x * right.x) + (this->y * right.y) + (this->z * right.z);
+    }
 };
 
 // specific overload for when constant is on the left hand side of the operator
