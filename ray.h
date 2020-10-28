@@ -43,7 +43,7 @@ class Ray {
 //
 // since we know everything except t, they can all be considered constants, leaving t
 // as the only unknown, making this function a quadtratic equation that is solvable
-// using the quadratic formula. If you assume a = B.B, b = (A - C), and c = (A - C).(A - C) - r^2
+// using the quadratic formula. If you assume a = B.B, b = 2 * B.(A - C), and c = (A - C).(A - C) - r^2
 // then:      at^2 + bt + c
 //
 // the quadtratic formula has the discriminant which allows us to know how many values
