@@ -52,17 +52,21 @@ class Ray {
 double hit_sphere(Vec3 const & sphere, double radius, Ray const & ray) {
     auto aMinusC = ray.orig - sphere; // A - C, which is used multiple times below so just do it once
 
-    auto a = ray.dir.length_squared(); // B.B is the same as length of B squared
-    auto b = (2.0 * ray.dir).dot(aMinusC);
+    auto a = ray.dir.length_squared(); // OPTIMISATION: B.B is the same as length of B squared
+    // OPTIMISATION: since b = 2 * B.(A - C), the 2 actually gets
+    // cancelled out with the 2 in the 2a (denominator) and the 4 in 4ac
+    // so instead we're only dealing with half of b instead of b and the rest
+    // of the calculations have been adjusted accordingly
+    auto halfB = (ray.dir).dot(aMinusC);
     auto c = aMinusC.dot(aMinusC) - (radius * radius);
 
-    auto discriminant = (b * b) - (4 * a * c);
+    auto discriminant = (halfB * halfB) - (a * c);
 
     if (discriminant < 0.0) { // ray does not hit sphere
         return -1;
     } else { // ray hits sphere in at least one place
         // the rest of the quadratic formula so we can get the value of t
-        return (-b - sqrt(discriminant)) / (2 * a);
+        return (-halfB - sqrt(discriminant)) / a;
     }
 }
 
