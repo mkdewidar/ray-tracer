@@ -3,6 +3,7 @@
 
 #include "vec3.h"
 #include "color.h"
+#include <cmath>
 
 class Ray {
     public:
@@ -48,7 +49,7 @@ class Ray {
 // the quadtratic formula has the discriminant which allows us to know how many values
 // of t there are for a given instance of the equation. this allows us to tell
 // whether the ray intersects the sphere at multiple points or just one or none.
-bool hit_sphere(Vec3 const & sphere, double radius, Ray const & ray) {
+double hit_sphere(Vec3 const & sphere, double radius, Ray const & ray) {
     auto aMinusC = ray.orig - sphere; // A - C, which is used multiple times below so just do it once
 
     auto a = ray.dir.length_squared(); // B.B is the same as length of B squared
@@ -56,12 +57,22 @@ bool hit_sphere(Vec3 const & sphere, double radius, Ray const & ray) {
     auto c = aMinusC.dot(aMinusC) - (radius * radius);
 
     auto discriminant = (b * b) - (4 * a * c);
-    return discriminant > 0;
+
+    if (discriminant < 0.0) { // ray does not hit sphere
+        return -1;
+    } else { // ray hits sphere in at least one place
+        // the rest of the quadratic formula so we can get the value of t
+        return (-b - sqrt(discriminant)) / (2 * a);
+    }
 }
 
 Color ray_color(Ray const & ray) {
-    if (hit_sphere(Vec3(0, 0, -1.0), 0.5, ray)) {
-        return Color(1.0, 0, 0);
+    auto sphereCenter = Vec3(0, 0, -1.0);
+    double t = hit_sphere(sphereCenter, 0.5, ray);
+    if (t > 0.0) {
+        Vec3 surfaceNormal = (ray.at(t) - sphereCenter).unit();
+        // convert the normal's axis from range of -1, 1 to 0, 1 and use that as the color
+        return 0.5 * Color(surfaceNormal.x + 1, surfaceNormal.y + 1, surfaceNormal.z + 1);
     }
 
     Vec3 unitDirection = ray.dir.unit();
