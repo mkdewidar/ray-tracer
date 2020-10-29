@@ -3,6 +3,7 @@
 
 #include "vec3.h"
 #include "color.h"
+#include "sphere.h"
 #include <cmath>
 
 class Ray {
@@ -20,63 +21,14 @@ class Ray {
         }
 };
 
-// a sphere is described using the equation x^2 + y^2 + z^2 = r^2
-// meanwhile, r can also be described as the magnitidue of the vector P - C
-// where C is the center of the sphere and P is a point on the sphere
-// additionally, a vector that is dot producted with itself produces the length squared
-// with all that in mind, (P - C).(P - C) = r^2
-// relative to our Rays, P = A + tB where A is the origin of the ray, t is some factor
-// and B is the direction.
-//
-// we can expand the equation as follows:
-//    (P - C).(P - C) = r^2
-//    (A + tB - C).(A + tB - C) = r^2                              substituted P = A + tB
-//    A.(A + tB - C) + tB.(A + tB - C) - C.(A + tB - C) = r^2      expanded (aka distribute)
-//    A.A + A.tB + A.-C + tB.A + tB.tB + tB.-C + -C.A + -C.tB + -C.-C = r^2
-//    A.A + 2(A.tB) + 2(A.-C) + tB.tB + 2(tB.-C) + -C.-C = r^2     combined similar elements
-//
-//    tB.tB becomes t^2(B.B) (due to associative law for scalar and dot product)
-//    2(A.tB) and 2(tB.-C) becomes 2tB.(A - C) (due to dot product distributivity)
-//    A.A + 2(A.-C) + -C.-C becomes (A - C).(A - C) (due to matching a quadratic formula)
-//
-// therefore:    t^2(B.B) + 2tB.(A - C) + (A - C).(A - C) - r^2 = 0
-//
-// since we know everything except t, they can all be considered constants, leaving t
-// as the only unknown, making this function a quadtratic equation that is solvable
-// using the quadratic formula. If you assume a = B.B, b = 2 * B.(A - C), and c = (A - C).(A - C) - r^2
-// then:      at^2 + bt + c
-//
-// the quadtratic formula has the discriminant which allows us to know how many values
-// of t there are for a given instance of the equation. this allows us to tell
-// whether the ray intersects the sphere at multiple points or just one or none.
-double hit_sphere(Vec3 const & sphere, double radius, Ray const & ray) {
-    auto aMinusC = ray.orig - sphere; // A - C, which is used multiple times below so just do it once
-
-    auto a = ray.dir.length_squared(); // OPTIMISATION: B.B is the same as length of B squared
-    // OPTIMISATION: since b = 2 * B.(A - C), the 2 actually gets
-    // cancelled out with the 2 in the 2a (denominator) and the 4 in 4ac
-    // so instead we're only dealing with half of b instead of b and the rest
-    // of the calculations have been adjusted accordingly
-    auto halfB = (ray.dir).dot(aMinusC);
-    auto c = aMinusC.dot(aMinusC) - (radius * radius);
-
-    auto discriminant = (halfB * halfB) - (a * c);
-
-    if (discriminant < 0.0) { // ray does not hit sphere
-        return -1;
-    } else { // ray hits sphere in at least one place
-        // the rest of the quadratic formula so we can get the value of t
-        return (-halfB - sqrt(discriminant)) / a;
-    }
-}
 
 Color ray_color(Ray const & ray) {
-    auto sphereCenter = Vec3(0, 0, -1.0);
-    double t = hit_sphere(sphereCenter, 0.5, ray);
-    if (t > 0.0) {
-        Vec3 surfaceNormal = (ray.at(t) - sphereCenter).unit();
+    auto sphere = Sphere(Vec3(0, 0, -1.0), 0.5);
+
+    auto hitResult = HitResult();
+    if (sphere.hit(ray, 1, 100, hitResult)) {
         // convert the normal's axis from range of -1, 1 to 0, 1 and use that as the color
-        return 0.5 * Color(surfaceNormal.x + 1, surfaceNormal.y + 1, surfaceNormal.z + 1);
+        return 0.5 * Color(hitResult.normal.x + 1, hitResult.normal.y + 1, hitResult.normal.z + 1);
     }
 
     Vec3 unitDirection = ray.dir.unit();
