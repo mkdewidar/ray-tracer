@@ -3,7 +3,6 @@
 
 #include "vec3.h"
 #include "color.h"
-#include "sphere.h"
 #include <cmath>
 
 class Ray {
@@ -21,12 +20,13 @@ class Ray {
         }
 };
 
+#include "sphere.h"
 
 Color ray_color(Ray const & ray) {
     auto sphere = Sphere(Vec3(0, 0, -1.0), 0.5);
 
     auto hitResult = HitResult();
-    if (sphere.hit(ray, 1, 100, hitResult)) {
+    if (sphere.hit(ray, 0.5, 100, hitResult)) {
         // convert the normal's axis from range of -1, 1 to 0, 1 and use that as the color
         return 0.5 * Color(hitResult.normal.x + 1, hitResult.normal.y + 1, hitResult.normal.z + 1);
     }

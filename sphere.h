@@ -3,7 +3,6 @@
 
 #include "hittable.h"
 #include "vec3.h"
-#include "ray.h"
 
 class Sphere : public Hittable {
 
