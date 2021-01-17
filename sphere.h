@@ -42,6 +42,9 @@ public:
     // the quadtratic formula has the discriminant which allows us to know how many values
     // of t there are for a given instance of the equation. this allows us to tell
     // whether the ray intersects the sphere at multiple points or just one or none.
+    //
+    // tMin and tMax allow for basic clipping based on the value of t for whatever
+    // the ray intersects with.
     virtual bool hit(Ray const & ray, double tMin, double tMax, HitResult & result) const override;
 
 };

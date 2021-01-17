@@ -33,9 +33,15 @@ int main() {
     auto focalLength = 1.0;
 
     auto origin = Point3(0, 0, 0);
-    auto horizontal = Vec3(viewportWidth, 0, 0); // relative to origin
-    auto vertical = Vec3(0, viewportHeight, 0); // relative to origin
-    // lower left corner of viewport, is where we start tracing from
+    // a vector that's the same length as the viewport's width and points only
+    // in the x axis for use later when traversing the scan lines
+    auto horizontal = Vec3(viewportWidth, 0, 0);
+    // a vector that's the same length as the viewport's height and points only
+    // in the y axis for use later when traversing the scan lines
+    auto vertical = Vec3(0, viewportHeight, 0);
+    // lower left corner of viewport, in combination with the vectors above and
+    // some other information in the rendering loop, we can traverse the viewport
+    // from left to right, and up to down
     auto lowerLeftCorner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focalLength);
 
     // rendering
@@ -48,7 +54,11 @@ int main() {
         // std::this_thread::sleep_for(50ms);
 
         for (int i = 0; i < imageWidth; ++i) { // from 0 -> width - 1
+            // a scalar value that is used to shorten the "horizontal" vector to
+            // the point on the viewport we are currently rendering
             double u = double(i) / (imageWidth - 1);
+            // a scalar value that is used to shorten the "vertical" vector to
+            // the point on the viewport we are currently rendering
             double v = double(j) / (imageHeight - 1);
 
             // origin may not be zero (if camera moved location), but the direction
