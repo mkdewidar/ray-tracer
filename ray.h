@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "color.h"
 #include <cmath>
+#include <vector>
 
 class Ray {
     public:
@@ -22,11 +23,30 @@ class Ray {
 
 #include "sphere.h"
 
-Color ray_color(Ray const & ray) {
-    auto sphere = Sphere(Vec3(0, 0, -1.0), 0.5);
+Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects) {
+
+    int max_ray_length = 100; // essentially 100 is our view distance
+
+    bool hit_anything = false;
 
     auto hitResult = HitResult();
-    if (sphere.hit(ray, 0.5, 100, hitResult)) {
+
+    for (std::unique_ptr<Hittable> const & object : objects) {
+        // for use inside the loop as an output parameter to the hit function
+        auto tmpHitResult = HitResult();
+
+        if (object->hit(ray, 0.5, max_ray_length, tmpHitResult)) {
+            hitResult = tmpHitResult;
+
+            // the t for object becomes our new max length of the ray
+            // allowing us to ensure we pick the color of objects that are closest to us
+            max_ray_length = hitResult.t;
+
+            hit_anything = true;
+        }
+    }
+
+    if (hit_anything) {
         // convert the normal's axis from range of -1, 1 to 0, 1 and use that as the color
         return 0.5 * Color(hitResult.normal.x + 1, hitResult.normal.y + 1, hitResult.normal.z + 1);
     }

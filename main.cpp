@@ -44,6 +44,9 @@ int main() {
     // from left to right, and up to down
     auto lowerLeftCorner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focalLength);
 
+    auto objects = std::vector<std::unique_ptr<Hittable>>();
+    objects.push_back(std::make_unique<Sphere>(Vec3(0, 0, -1.0), 0.5));
+
     // rendering
     std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";
 
@@ -66,7 +69,7 @@ int main() {
             // at the end makes the direction relative to whatever the camera's location is
             auto r = Ray(origin, lowerLeftCorner + (u * horizontal) + (v * vertical) - origin);
 
-            Color c = ray_color(r);
+            Color c = ray_color(r, objects);
 
             write_color(std::cout, c);
         }
