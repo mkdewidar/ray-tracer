@@ -68,7 +68,7 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
         result.t = (-halfB - sqrt(discriminant)) / a;
         if ((result.t < tMax) && (result.t > tMin)) {
             result.point = ray.at(result.t);
-            result.normal = (result.point - this->center).unit();
+            result.set_face_normal(ray, (result.point - this->center) / this->radius);
 
             return true;
         }
@@ -78,7 +78,7 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
         result.t = (-halfB - sqrt(discriminant)) / a;
         if ((result.t < tMax) && (result.t > tMin)) {
             result.point = ray.at(result.t);
-            result.normal = (result.point - this->center).unit();
+            result.set_face_normal(ray, (result.point - this->center) / this->radius);
 
             return true;
         }

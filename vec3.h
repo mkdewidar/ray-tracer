@@ -17,6 +17,10 @@ struct Vec3 {
         return Vec3(this->x + right.x, this->y + right.y, this->z + right.z);
     }
 
+    inline Vec3 operator-() const {
+        return Vec3(-this->x, -this->y, -this->z);
+    }
+
     inline Vec3 operator-(Vec3 const & right) const {
         return Vec3(this->x - right.x, this->y - right.y, this->z - right.z);
     }
