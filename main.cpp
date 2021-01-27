@@ -3,6 +3,7 @@
 
 #include "vec3.h"
 #include "ray.h"
+#include "random.h"
 
 
 using namespace std::chrono_literals;
@@ -44,8 +45,12 @@ int main() {
     // from left to right, and up to down
     auto lowerLeftCorner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focalLength);
 
+    // Anti-aliasing samples per pixel
+    auto aaSamples = 10;
+
     auto objects = std::vector<std::unique_ptr<Hittable>>();
     objects.push_back(std::make_unique<Sphere>(Vec3(0, 0, -1.0), 0.5));
+    objects.push_back(std::make_unique<Sphere>(Vec3(0, -101, -1.0), 100));
 
     // rendering
     std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";
@@ -57,21 +62,27 @@ int main() {
         // std::this_thread::sleep_for(50ms);
 
         for (int i = 0; i < imageWidth; ++i) { // from 0 -> width - 1
-            // a scalar value that is used to shorten the "horizontal" vector to
-            // the point on the viewport we are currently rendering
-            double u = double(i) / (imageWidth - 1);
-            // a scalar value that is used to shorten the "vertical" vector to
-            // the point on the viewport we are currently rendering
-            double v = double(j) / (imageHeight - 1);
 
-            // origin may not be zero (if camera moved location), but the direction
-            // we would have calculated would be relative to true origin. The - origin
-            // at the end makes the direction relative to whatever the camera's location is
-            auto r = Ray(origin, lowerLeftCorner + (u * horizontal) + (v * vertical) - origin);
+            // this anti-aliasing implementation relies on taking random samples
+            // of color and average them all to get the color for this pixel
+            Color cumulativeColor = Color(0, 0, 0);
+            for (int s = 0; s < aaSamples; ++s) {
+                // a scalar value that is used to shorten the "horizontal" vector to
+                // the point on the viewport we are currently rendering
+                double u = (double(i) + random_double()) / (imageWidth - 1);
+                // a scalar value that is used to shorten the "vertical" vector to
+                // the point on the viewport we are currently rendering
+                double v = (double(j) + random_double()) / (imageHeight - 1);
 
-            Color c = ray_color(r, objects);
+                // origin may not be zero (if camera moved location), but the direction
+                // we would have calculated would be relative to true origin. The - origin
+                // at the end makes the direction relative to whatever the camera's location is
+                auto r = Ray(origin, lowerLeftCorner + (u * horizontal) + (v * vertical) - origin);
 
-            write_color(std::cout, c);
+                cumulativeColor = cumulativeColor + ray_color(r, objects);
+            }
+
+            write_color(std::cout, cumulativeColor / aaSamples);
         }
     }
 

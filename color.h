@@ -22,6 +22,10 @@ struct Color {
         return Color(constant * this->_r, constant * this->_g, constant * this->_b);
     }
 
+    inline Color operator/(double const constant) const {
+        return Color(this->_r / constant, this->_g / constant, this->_b / constant);
+    }
+
     inline double r() const {
         return this->_r;
     }
@@ -35,17 +39,14 @@ struct Color {
     }
 
     inline void r(double red) {
-        assert(((red >= 0.0) && (red <= 1.0)) && "0.0 <= Red <= 1.0");
         this->_r = red;
     }
 
     inline void g(double green) {
-        assert(((green >= 0.0) && (green <= 1.0)) && "0.0 <= Green <= 1.0");
         this->_g = green;
     }
 
     inline void b(double blue) {
-        assert(((blue >= 0.0) && (blue <= 1.0)) && "0.0 <= Blue <= 1.0");
         this->_b = blue;
     }
 
