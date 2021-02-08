@@ -46,7 +46,9 @@ int main() {
     auto lowerLeftCorner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focalLength);
 
     // Anti-aliasing samples per pixel
-    auto aaSamples = 10;
+    auto const aaSamples = 10;
+    // Number of reflections/bounces we can make off objects
+    auto const maxDepth = 50;
 
     auto objects = std::vector<std::unique_ptr<Hittable>>();
     objects.push_back(std::make_unique<Sphere>(Vec3(0, 0, -1.0), 0.5));
@@ -79,10 +81,17 @@ int main() {
                 // at the end makes the direction relative to whatever the camera's location is
                 auto r = Ray(origin, lowerLeftCorner + (u * horizontal) + (v * vertical) - origin);
 
-                cumulativeColor = cumulativeColor + ray_color(r, objects);
+                cumulativeColor = cumulativeColor + ray_color(r, objects, maxDepth);
             }
 
-            write_color(std::cout, cumulativeColor / aaSamples);
+            // this "gamma corrects" the colors, which I don't really understand
+            // and my image was already lighter than the guide for some reaso
+            auto gammaCorrected = Color(
+                sqrt(cumulativeColor.r() / aaSamples),
+                sqrt(cumulativeColor.g() / aaSamples),
+                sqrt(cumulativeColor.b() / aaSamples));
+
+            write_color(std::cout, gammaCorrected);
         }
     }
 

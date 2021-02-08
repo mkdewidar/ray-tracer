@@ -1,6 +1,7 @@
 #ifndef RAY_H
 #define RAY_H
 
+#include "random.h"
 #include "vec3.h"
 #include "color.h"
 #include <cmath>
@@ -23,7 +24,13 @@ class Ray {
 
 #include "sphere.h"
 
-Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects) {
+Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects, int depth) {
+
+    // when depth is zero we've bounced off of objects too many times
+    // this is a safeguard against blowing the stack
+    if (depth <= 0) {
+        return Color(0, 0, 0);
+    }
 
     int max_ray_length = 100; // essentially 100 is our view distance
 
@@ -35,7 +42,7 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
         // for use inside the loop as an output parameter to the hit function
         auto tmpHitResult = HitResult();
 
-        if (object->hit(ray, 0.5, max_ray_length, tmpHitResult)) {
+        if (object->hit(ray, 0.00001, max_ray_length, tmpHitResult)) {
             hitResult = tmpHitResult;
 
             // the t for object becomes our new max length of the ray
@@ -47,8 +54,13 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
     }
 
     if (hit_anything) {
-        // convert the normal's axis from range of -1, 1 to 0, 1 and use that as the color
-        return 0.5 * Color(hitResult.normal.x + 1, hitResult.normal.y + 1, hitResult.normal.z + 1);
+        // we're imagining that there is a sphere where the normal vector is
+        // the radius, then we get a random unit vector from there and follow it
+        // to end up in some random place outside the surface we just hit
+        auto reflectedRayDirection = (hitResult.point + hitResult.normal + random_unit_vec3()) - hitResult.point;
+        auto reflectedRay = Ray(hitResult.point, reflectedRayDirection);
+
+        return 0.5 * ray_color(reflectedRay, objects, depth - 1);
     }
 
     Vec3 unitDirection = ray.dir.unit();
