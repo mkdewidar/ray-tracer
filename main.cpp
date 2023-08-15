@@ -58,7 +58,7 @@ int main() {
     std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";
 
     for (int j = imageHeight - 1; j >= 0; --j) { // from height - 1 -> 0
-        std::cerr << "\rScanlines remaining: " << j << std::flush;
+        std::clog << "\rScanlines remaining: " << j << std::flush;
 
         // uncomment the line below to slow the rendering and see the progress bar
         // std::this_thread::sleep_for(50ms);
@@ -95,7 +95,7 @@ int main() {
         }
     }
 
-    std::cerr << "\nDone\n";
+    std::clog << "\nDone\n";
 
     return 0;
 }
