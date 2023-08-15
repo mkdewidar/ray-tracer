@@ -23,6 +23,8 @@ int main() {
     int const imageWidth = 400;
     int const imageHeight = static_cast<int>(imageWidth / aspectRatio);
 
+    std::clog << "Image width: " << imageWidth << ", height: " << imageHeight << "\n";
+
     // viewport and camera
 
     // viewport is our window to the world, if you imagine looking through a window
@@ -37,6 +39,9 @@ int main() {
     // the distance between the eye and the glass
     auto focalLength = 1.0;
 
+    std::clog << "Viewport width: " << viewportWidth << ", height: " << viewportHeight
+              << ", focal length: " << focalLength << "\n";
+
     auto origin = Point3(0, 0, 0);
     // a vector that's the same length as the viewport's width and points only
     // in the x axis for use later when traversing the scan lines
@@ -49,6 +54,11 @@ int main() {
     // from left to right, and up to down
     auto lowerLeftCorner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focalLength);
 
+    std::clog << "Origin (center of viewport): " << origin
+              << "\nHorizontal vector: " << horizontal
+              << "\nVertical vector: " << vertical
+              << "\nLower left corner: " << lowerLeftCorner << "\n";
+
     // Anti-aliasing samples per pixel
     auto const aaSamples = 10;
     // Number of reflections/bounces we can make off objects
@@ -57,6 +67,8 @@ int main() {
     auto objects = std::vector<std::unique_ptr<Hittable>>();
     objects.push_back(std::make_unique<Sphere>(Vec3(0, 0, -1.0), 0.5));
     objects.push_back(std::make_unique<Sphere>(Vec3(0, -101, -1.0), 100));
+
+    std::clog << "\n" << std::flush;
 
     // rendering
     std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";

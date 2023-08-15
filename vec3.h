@@ -2,6 +2,7 @@
 #define VEC3_H
 
 #include <cmath>
+#include <ostream>
 
 struct Vec3 {
     double x;
@@ -54,6 +55,10 @@ struct Vec3 {
 // so technically this is an overload for double
 inline Vec3 operator*(double const left, Vec3 const & right) {
     return right * left;
+}
+
+inline std::ostream & operator<<(std::ostream & out, Vec3 const & v) {
+    return out << v.x << " " << v.y << " " << v.z;
 }
 
 using Point3 = Vec3;
