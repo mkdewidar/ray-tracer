@@ -29,7 +29,11 @@ int main() {
     // or a pair of glasses, the viewport is the glass, and the camera is the eye
 
     auto viewportHeight = 2.0;
-    auto viewportWidth = aspectRatio * viewportHeight;
+    // we don't use aspectRatio because it might not be the real aspect ratio of the image, since the image's dimensions
+    // are ints but the aspect ratio is a real number,
+    // casting one of the image dimensions to a double first ensures we use double division instead of int division,
+    // and therefore aren't prematurely truncating any real numbers
+    auto viewportWidth = (static_cast<double>(imageWidth) / imageHeight) * viewportHeight;
     // the distance between the eye and the glass
     auto focalLength = 1.0;
 
