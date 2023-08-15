@@ -8,7 +8,7 @@ struct Vec3 {
     double y;
     double z;
 
-    Vec3() { }
+    Vec3() : x(0), y(0), z(0) { }
 
     Vec3(double i, double j, double k)
         : x(i), y(j), z(k) { }

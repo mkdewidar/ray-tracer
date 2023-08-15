@@ -5,7 +5,7 @@
 #include <cassert>
 
 struct Color {
-    Color() { }
+    Color() : _r(0), _g(0), _b(0) { }
 
     Color(double red, double green, double blue)
         : _r(red), _g(green), _b(blue) { }

@@ -12,7 +12,7 @@ class Ray {
         Vec3 orig;
         Vec3 dir;
 
-        Ray() { }
+        Ray() : orig(), dir() { }
 
         Ray(Vec3 const & origin, Vec3 const & direction)
             : orig(origin), dir(direction) { }
