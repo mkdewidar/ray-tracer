@@ -105,12 +105,13 @@ int main() {
             // of color and average them all to get the color for this pixel
             Color cumulativeColor = Color(0, 0, 0);
             for (int s = 0; s < aaSamples; ++s) {
+
                 // a scalar value that is used to shorten the "horizontal" vector to
                 // the point on the viewport we are currently rendering
-                double u = (double(i) + random_double()) / (imageWidth - 1);
+                double u = (double(i) + random_double(0.0, 0.9)) / (imageWidth - 1);
                 // a scalar value that is used to shorten the "vertical" vector to
                 // the point on the viewport we are currently rendering
-                double v = (double(j) + random_double()) / (imageHeight - 1);
+                double v = (double(j) + random_double(0.0, 0.9)) / (imageHeight - 1);
 
                 // origin may not be zero (if camera moved location), but the direction
                 // we would have calculated would be relative to true origin. The - origin
