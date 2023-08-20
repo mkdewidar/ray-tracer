@@ -42,4 +42,13 @@ inline Vec3 random_unit_vec3() {
     return random_unit_vec3_in_unit_sphere().unit();
 }
 
+inline Vec3 random_in_hemisphere(Vec3 const & normal) {
+    Vec3 in_unit_sphere = random_unit_vec3_in_unit_sphere();
+    if (in_unit_sphere.dot(normal) > 0.0) {
+        return in_unit_sphere;
+    } else {
+        return -in_unit_sphere;
+    }
+}
+
 #endif

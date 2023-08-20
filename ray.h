@@ -75,6 +75,9 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
         auto reflectedRayDirection = (hitResult.point + hitResult.normal + random_unit_vec3()) - hitResult.point;
         auto reflectedRay = Ray(hitResult.point, reflectedRayDirection);
 
+        // replace the above with this for an alternative diffuse method
+        // auto reflectedRay = Ray(hitResult.point, random_in_hemisphere(hitResult.normal));
+
         return 0.5 * ray_color(reflectedRay, objects, depth - 1);
         // to show a representation of the normals instead of whats above use: 0.5 * (hitResult.normal + Vec3(1, 1, 1))
         // the addition of 1 is to make sure its positive so we don't end up with negative colors
