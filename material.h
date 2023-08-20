@@ -50,12 +50,12 @@ class LambertianMaterial : public Material {
 // Shiny metallic material
 class MetalMaterial : public Material {
     public:
-        MetalMaterial(Color const & a) : albedo(a) { }
+        MetalMaterial(Color const & a, double const f) : albedo(a), fuzz(f < 1 ? f : 1) { }
 
         virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const override {
             auto reflectedRayDirection = incomingRay.dir.unit().reflect(result.normal);
 
-            scatteredRay = Ray(result.point, reflectedRayDirection);
+            scatteredRay = Ray(result.point, reflectedRayDirection + (fuzz * random_unit_vec3_in_unit_sphere()));
             attenuation = this->albedo;
 
             LOG(
@@ -71,6 +71,7 @@ class MetalMaterial : public Material {
 
     public:
         Color albedo;
+        double fuzz;
 };
 
 #endif

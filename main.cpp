@@ -85,11 +85,11 @@ int main() {
     // left sphere
     objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
                                                0.5,
-                                               std::make_shared<MetalMaterial>(Color(0.8, 0.8, 0.8))));
+                                               std::make_shared<MetalMaterial>(Color(0.8, 0.8, 0.8), 0.3)));
     // right sphere
     objects.push_back(std::make_unique<Sphere>(Vec3(1.0, 0.0, -1.0),
                                                0.5,
-                                               std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2))));
+                                               std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2), 1.0)));
 
     std::clog << "World contains objects: \n";
     for (auto & obj : objects) {
