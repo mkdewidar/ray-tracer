@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "ray.h"
 #include "random.h"
+#include "logger.h"
 
 
 using namespace std::chrono_literals;
@@ -68,11 +69,17 @@ int main() {
     objects.push_back(std::make_unique<Sphere>(Vec3(0, 0, -1.0), 0.5));
     objects.push_back(std::make_unique<Sphere>(Vec3(0, -101, -1.0), 100));
 
+    std::clog << "World contains objects: \n";
+    for (auto & obj : objects) {
+        std::clog << "- " << obj << "\n";
+    }
+
     std::clog << "\n" << std::flush;
 
     // rendering
     std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";
 
+    // from top to bottom, left to right
     for (int j = imageHeight - 1; j >= 0; --j) { // from height - 1 -> 0
         std::clog << "\rScanlines remaining: " << j << std::flush;
 
@@ -80,6 +87,19 @@ int main() {
         // std::this_thread::sleep_for(50ms);
 
         for (int i = 0; i < imageWidth; ++i) { // from 0 -> width - 1
+            LOGGER_ENABLED = false;
+            // uncomment the lines below and insert the pixel values for the rectangle you wish to debug
+            // and all log lines will be printed during the calculation of that pixel value
+            // if ((j >= 110) && (j <= 113)) {
+            //     if ((i >= 120) && (i <= 210)) {
+            //         LOGGER_ENABLED = true;
+            //         std::clog << "\n" << "----" << "\n";
+            //     }
+            // }
+
+            LOG(
+                std::clog << "Pixel " << i << " " << j << "\n";
+            )
 
             // this anti-aliasing implementation relies on taking random samples
             // of color and average them all to get the color for this pixel
@@ -101,7 +121,7 @@ int main() {
             }
 
             // this "gamma corrects" the colors, which I don't really understand
-            // and my image was already lighter than the guide for some reaso
+            // and my image was already lighter than the guide for some reason
             auto gammaCorrected = Color(
                 sqrt(cumulativeColor.r() / aaSamples),
                 sqrt(cumulativeColor.g() / aaSamples),

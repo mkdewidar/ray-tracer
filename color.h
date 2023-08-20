@@ -4,6 +4,8 @@
 #include <ostream>
 #include <cassert>
 
+#include "logger.h"
+
 struct Color {
     Color() : _r(0), _g(0), _b(0) { }
 
@@ -66,6 +68,11 @@ void write_color(std::ostream & output, Color const & c) {
     int R = static_cast<int>(c.r() * 255.999); // the .999 allows us
     int G = static_cast<int>(c.g() * 255.999); // to make sure 256 is
     int B = static_cast<int>(c.b() * 255.999); // as likely to occur as other colors
+
+    LOG(
+        std::clog << "Raw color: " << c.r() << " " << c.g() << " " << c.b() << "\n";
+        std::clog << "Actual color: " << R << " " << G << " " << B << "\n";
+    )
 
     output << R << " " << G << " " << B << "\n";
 }

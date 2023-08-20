@@ -3,6 +3,7 @@
 
 #include "hittable.h"
 #include "vec3.h"
+#include "logger.h"
 
 class Sphere : public Hittable {
 
@@ -57,29 +58,44 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
     // cancelled out with the 2 in the 2a (denominator) and the 4 in 4ac
     // so instead we're only dealing with half of b instead of b and the rest
     // of the calculations have been adjusted accordingly
-    auto halfB = (ray.dir).dot(aMinusC);
-    auto c = aMinusC.dot(aMinusC) - (this->radius * this->radius);
+    auto halfB = (aMinusC).dot(ray.dir);
+    auto c = aMinusC.length_squared() - (this->radius * this->radius);
 
     auto discriminant = (halfB * halfB) - (a * c);
 
-    if (discriminant > 0.0) {
+    if (discriminant >= 0) {
         // ray hits sphere in at least one place
         // the rest of the quadratic formula so we can get the value of t
-        result.t = (-halfB - sqrt(discriminant)) / a;
-        if ((result.t < tMax) && (result.t > tMin)) {
+        auto sqrtOfD = sqrt(discriminant);
+        auto root = (-halfB - sqrtOfD) / a;
+        LOG(
+            std::clog << "First root is: " << root << ", min: " << tMin << ", max: " << tMax << "\n";
+        )
+        if ((root <= tMax) && (root >= tMin)) {
+            result.t = root;
             result.point = ray.at(result.t);
             result.set_face_normal(ray, (result.point - this->center) / this->radius);
 
+            LOG(
+                std::clog << "Using first root" << "\n";
+            )
             return true;
         }
 
         // the previous value of t didn't fit in the ray's "length" limits
         // we try the second value
-        result.t = (-halfB - sqrt(discriminant)) / a;
-        if ((result.t < tMax) && (result.t > tMin)) {
+        root = (-halfB + sqrtOfD) / a;
+        LOG(
+            std::clog << "Second root is: " << root << ", min: " << tMin << ", max: " << tMax << "\n";
+        )
+        if ((root <= tMax) && (root >= tMin)) {
+            result.t = root;
             result.point = ray.at(result.t);
             result.set_face_normal(ray, (result.point - this->center) / this->radius);
 
+            LOG(
+                std::clog << "Using second root" << "\n";
+            )
             return true;
         }
     }
