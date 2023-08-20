@@ -24,6 +24,10 @@ struct Color {
         return Color(constant * this->_r, constant * this->_g, constant * this->_b);
     }
 
+    inline Color operator*(Color const & right) const {
+        return Color(this->_r * right.r(), this->_g * right.g(), this->_b * right.b());
+    }
+
     inline Color operator/(double const constant) const {
         return Color(this->_r / constant, this->_g / constant, this->_b / constant);
     }

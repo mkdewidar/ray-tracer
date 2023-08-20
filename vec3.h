@@ -46,6 +46,18 @@ struct Vec3 {
         return *this / this->length();
     }
 
+    bool near_zero() const {
+        auto const granularity = 1e-8;
+        return (fabs(x) < granularity) && (fabs(y) < granularity) && (fabs(z) < granularity);
+    }
+
+    // reflects this Vec3 along the normal vector given
+    // reflection of a vector v is v - 2(the projection of v onto the normal)
+    // which leads to the equation v - 2(v.n)*n
+    Vec3 reflect(Vec3 const & normal) {
+        return *this - (normal * (2 * this->dot(normal)));
+    }
+
     double dot(Vec3 const & right) const {
         return (this->x * right.x) + (this->y * right.y) + (this->z * right.z);
     }

@@ -1,18 +1,19 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "hittable.h"
+#include "ray.h"
 #include "vec3.h"
-#include "logger.h"
+#include "hittable.h"
 
 class Sphere : public Hittable {
 
 public:
     Point3 center;
     double radius;
+    std::shared_ptr<Material> material;
 
     Sphere() { }
-    Sphere(Point3 c, double r) : center(c), radius(r) { }
+    Sphere(Point3 c, double r, std::shared_ptr<Material> m) : center(c), radius(r), material(m) { }
 
     // a sphere is described using the equation x^2 + y^2 + z^2 = r^2
     // meanwhile, r can also be described as the magnitidue of the vector P - C
@@ -75,6 +76,7 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
             result.t = root;
             result.point = ray.at(result.t);
             result.set_face_normal(ray, (result.point - this->center) / this->radius);
+            result.material = this->material;
 
             LOG(
                 std::clog << "Using first root" << "\n";
@@ -92,6 +94,7 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
             result.t = root;
             result.point = ray.at(result.t);
             result.set_face_normal(ray, (result.point - this->center) / this->radius);
+            result.material = this->material;
 
             LOG(
                 std::clog << "Using second root" << "\n";

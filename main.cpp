@@ -1,10 +1,17 @@
 #include <iostream>
 #include <thread>
 
+
 #include "vec3.h"
-#include "ray.h"
+#include "color.h"
 #include "random.h"
 #include "logger.h"
+
+#include "ray.h"
+
+#include "hittable.h"
+#include "material.h"
+#include "sphere.h"
 
 
 using namespace std::chrono_literals;
@@ -66,8 +73,23 @@ int main() {
     auto const maxDepth = 50;
 
     auto objects = std::vector<std::unique_ptr<Hittable>>();
-    objects.push_back(std::make_unique<Sphere>(Vec3(0, 0, -1.0), 0.5));
-    objects.push_back(std::make_unique<Sphere>(Vec3(0, -101, -1.0), 100));
+
+    // ground
+    objects.push_back(std::make_unique<Sphere>(Vec3(0.0, -100.5, -1.0),
+                                               100.0,
+                                               std::make_shared<LambertianMaterial>(Color(0.8, 0.8, 0.0))));
+    // center sphere
+    objects.push_back(std::make_unique<Sphere>(Vec3(0.0, 0.0, -1.0),
+                                               0.5,
+                                               std::make_shared<LambertianMaterial>(Color(0.7, 0.3, 0.3))));
+    // left sphere
+    objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
+                                               0.5,
+                                               std::make_shared<MetalMaterial>(Color(0.8, 0.8, 0.8))));
+    // right sphere
+    objects.push_back(std::make_unique<Sphere>(Vec3(1.0, 0.0, -1.0),
+                                               0.5,
+                                               std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2))));
 
     std::clog << "World contains objects: \n";
     for (auto & obj : objects) {

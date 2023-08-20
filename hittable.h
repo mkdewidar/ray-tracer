@@ -1,13 +1,17 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "vec3.h"
 #include "ray.h"
+
+class Material;
 
 // contains the result of a intersection
 struct HitResult {
     Point3 point;
     Vec3 normal;
     bool front_face;
+    std::shared_ptr<Material> material;
     double t = -1.0;
 
     // sets the normal field as well as the face based on the direction of the
