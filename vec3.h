@@ -58,6 +58,22 @@ struct Vec3 {
         return *this - (normal * (2 * this->dot(normal)));
     }
 
+    // refraction is a ray coming into a material one angle from a normal, and
+    // leaving at another angle from the normal into the second material
+    // this function returns the refracted vector
+    // normal is the vector perpendicular to the material surface where the ray is coming,
+    // default direction is "upwards" from the material
+    // refractiveIndexRatio is the ratio of the refractive index of the outside material (usually air)
+    // over the inside material of the inside
+    // NOTE: "this" vector must be a unit vector when you use this function on it
+    Vec3 refract(Vec3 const & normal, double const refractiveIndexRatio) {
+        // the component of the refracted vector that is perpendicular to the normal
+        Vec3 refractedVectorPerp = ((*this) + (normal * fmin((-(*this)).dot(normal), 1.0))) * refractiveIndexRatio;
+        // the component of the refracted vector that is parallel to the normal
+        Vec3 refractedVectorParallel = normal * -sqrt(fabs(1.0 - refractedVectorPerp.length_squared()));
+        return refractedVectorParallel + refractedVectorPerp;
+    }
+
     double dot(Vec3 const & right) const {
         return (this->x * right.x) + (this->y * right.y) + (this->z * right.z);
     }

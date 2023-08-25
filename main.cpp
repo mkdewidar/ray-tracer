@@ -85,7 +85,11 @@ int main() {
     // left sphere
     objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
                                                0.5,
-                                               std::make_shared<MetalMaterial>(Color(0.8, 0.8, 0.8), 0.3)));
+                                               std::make_shared<DielectricMaterial>(1.5)));
+    // left sphere, again, this time its inside the other left sphere, and also is inside out (negative radius)
+    objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
+                                               -0.4,
+                                               std::make_shared<DielectricMaterial>(1.5)));
     // right sphere
     objects.push_back(std::make_unique<Sphere>(Vec3(1.0, 0.0, -1.0),
                                                0.5,

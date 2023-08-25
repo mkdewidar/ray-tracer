@@ -74,4 +74,47 @@ class MetalMaterial : public Material {
         double fuzz;
 };
 
+class DielectricMaterial : public Material {
+    public:
+        DielectricMaterial(double const ri) : refractionIndex(ri) { }
+
+        virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const override {
+            attenuation = Color(1.0, 1.0, 1.0);
+
+            // assuming that the material on the "outside" is air
+            double refractionIndexRatio = result.front_face ? (1.0 / refractionIndex) : refractionIndex;
+
+            Vec3 incomingRayDirUnit = incomingRay.dir.unit();
+
+            // "theta" is the angle between the incoming ray and the normal
+            double cosineTheta = fmin((-incomingRayDirUnit).dot(result.normal), 1.0);
+            double sineTheta = sqrt(1.0 - (cosineTheta * cosineTheta));
+
+            // if sineThetaPrime (which is the result of ratio * sineTheta) is greater than 1.0
+            // then Snell's law has no real solution and we cannot refract, and instead perform total internal reflection
+            bool cannotRefract = (refractionIndexRatio * sineTheta) > 1.0;
+
+            Vec3 outVector;
+            if (cannotRefract || (reflectance(cosineTheta, refractionIndexRatio) > random_double())) {
+                outVector = incomingRayDirUnit.reflect(result.normal);
+            } else {
+                outVector = incomingRayDirUnit.refract(result.normal, refractionIndexRatio);
+            }
+
+            scatteredRay = Ray(result.point, outVector);
+            return true;
+        }
+
+    public:
+        double refractionIndex;
+
+    private:
+        // an implementation of Schlick's approximation, which approximates how much of the incoming ray is reflected back
+        static double reflectance(double cosineTheta, double refractiveIndex) {
+            auto r0 = (1 - refractiveIndex) / (1 + refractiveIndex);
+            r0 = r0 * r0;
+            return r0 + ((1 - r0) * pow((1 - cosineTheta), 5));
+        }
+};
+
 #endif
