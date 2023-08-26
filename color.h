@@ -68,9 +68,13 @@ void write_color(std::ostream & output, Color const & c) {
     auto intensityLimit = Interval(0.000000, 0.999999);
 
     // don't want to actually get 256 as a color value, we want to stop at 255
-    int R = static_cast<int>(intensityLimit.clamp(c.r) * 256);
-    int G = static_cast<int>(intensityLimit.clamp(c.g) * 256);
-    int B = static_cast<int>(intensityLimit.clamp(c.b) * 256);
+    // as for the sqrt, that's "gamma correction". The color we receive into this function
+    // is in "linear space", whereas most image viewing programs expect color to be in "gamma space",
+    // where the spacing between color values is not even. Doing the sqrt of a color value converts
+    // our colors to "gamma 2" space. See https://docs.unity3d.com/Manual/LinearLighting.html for more info.
+    int R = static_cast<int>(intensityLimit.clamp(sqrt(c.r)) * 256);
+    int G = static_cast<int>(intensityLimit.clamp(sqrt(c.g)) * 256);
+    int B = static_cast<int>(intensityLimit.clamp(sqrt(c.b)) * 256);
 
     LOG(
         std::clog << "Raw color: " << c.r << " " << c.g << " " << c.b << "\n";
