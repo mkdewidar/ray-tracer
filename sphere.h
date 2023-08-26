@@ -15,7 +15,7 @@ public:
     Sphere();
     Sphere(Point3 c, double r, std::shared_ptr<Material> m);
 
-    virtual bool hit(Ray const & ray, double tMin, double tMax, HitResult & result) const override;
+    virtual bool hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const override;
 
 };
 
@@ -53,10 +53,7 @@ Sphere::Sphere(Point3 c, double r, std::shared_ptr<Material> m) : center(c), rad
 // the quadtratic formula has the discriminant which allows us to know how many values
 // of t there are for a given instance of the equation. this allows us to tell
 // whether the ray intersects the sphere at multiple points or just one or none.
-//
-// tMin and tMax allow for basic clipping based on the value of t for whatever
-// the ray intersects with.
-bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) const {
+bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const {
     Vec3 aMinusC = ray.orig - this->center; // A - C, which is used multiple times below so just do it once
 
     auto a = ray.dir.length_squared(); // OPTIMISATION: B.B is the same as length of B squared
@@ -75,9 +72,9 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
         auto sqrtOfD = sqrt(discriminant);
         auto root = (-halfB - sqrtOfD) / a;
         LOG(
-            std::clog << "First root is: " << root << ", min: " << tMin << ", max: " << tMax << "\n";
+            std::clog << "First root is: " << root << ", min: " << rayLimits.min << ", max: " << rayLimits.max << "\n";
         )
-        if ((root <= tMax) && (root >= tMin)) {
+        if (rayLimits.contains(root)) {
             result.t = root;
             result.point = ray.at(result.t);
             result.set_face_normal(ray, (result.point - this->center) / this->radius);
@@ -93,9 +90,9 @@ bool Sphere::hit(Ray const & ray, double tMin, double tMax, HitResult & result) 
         // we try the second value
         root = (-halfB + sqrtOfD) / a;
         LOG(
-            std::clog << "Second root is: " << root << ", min: " << tMin << ", max: " << tMax << "\n";
+            std::clog << "Second root is: " << root << ", min: " << rayLimits.min << ", max: " << rayLimits.max << "\n";
         )
-        if ((root <= tMax) && (root >= tMin)) {
+        if (rayLimits.contains(root)) {
             result.t = root;
             result.point = ray.at(result.t);
             result.set_face_normal(ray, (result.point - this->center) / this->radius);

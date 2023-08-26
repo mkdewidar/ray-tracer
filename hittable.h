@@ -3,6 +3,7 @@
 
 #include "vec3.h"
 #include "ray.h"
+#include "interval.h"
 
 class Material;
 
@@ -27,8 +28,8 @@ class Hittable {
         // override this to define how to detect a intersection with the given ray.
         // returns true if ray interests or false otherwise, intersection properties
         // are returned in the "result" parameter
-        // min and max are to control the "length" of the ray
-        virtual bool hit(Ray const & ray, double tMin, double tMax, HitResult & result) const = 0;
+        // rayLimits controls how far the ray can go
+        virtual bool hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const = 0;
 };
 
 // ------

@@ -62,7 +62,7 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
 
     for (std::unique_ptr<Hittable> const & object : objects) {
 
-        if (object->hit(ray, 0.00001, maxRayLength, tmpHitResult)) {
+        if (object->hit(ray, Interval(0.00001, maxRayLength), tmpHitResult)) {
             hitResult = tmpHitResult;
 
             // the t for object becomes our new max length of the ray
