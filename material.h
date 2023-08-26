@@ -4,7 +4,7 @@
 #include "color.h"
 #include "logger.h"
 
-struct HitResult;
+class HitResult;
 
 class Material {
     public:
@@ -82,7 +82,7 @@ class DielectricMaterial : public Material {
             attenuation = Color(1.0, 1.0, 1.0);
 
             // assuming that the material on the "outside" is air
-            double refractionIndexRatio = result.front_face ? (1.0 / refractionIndex) : refractionIndex;
+            double refractionIndexRatio = result.isFrontFace ? (1.0 / refractionIndex) : refractionIndex;
 
             Vec3 incomingRayDirUnit = incomingRay.dir.unit();
 

@@ -71,7 +71,7 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
 
             didHitAnything = true;
             LOG(
-                std::clog << "Ray hit object " << object << " with t = " << hitResult.t << ", front face: " << hitResult.front_face << "\n";
+                std::clog << "Ray hit object " << object << " with t = " << hitResult.t << ", front face: " << hitResult.isFrontFace << "\n";
                 std::clog << "Normal: " << hitResult.normal.x << " " << hitResult.normal.y << " " << hitResult.normal.z << "\n";
             )
         }
