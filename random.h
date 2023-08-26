@@ -42,6 +42,10 @@ inline Vec3 random_unit_vec3() {
     return random_unit_vec3_in_unit_sphere().unit();
 }
 
+// generates a random vector that is in the same direction as the normal
+// it does this by generating a random vector in a sphere, and if what we generated
+// is in the opposite direction (i.e wrong "hemisphere") then we inverse it and use
+// it (rather than throw it away and try again)
 inline Vec3 random_in_hemisphere(Vec3 const & normal) {
     Vec3 in_unit_sphere = random_unit_vec3_in_unit_sphere();
     if (in_unit_sphere.dot(normal) > 0.0) {

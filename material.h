@@ -14,6 +14,8 @@ class Material {
 };
 
 // Lambertian diffuse material
+// an approach for modelling diffuse surfaces that includes bouncing rays that intersect with the object
+// at angles that are closer to the normal
 class LambertianMaterial : public Material {
     public:
         LambertianMaterial(Color const & a) : albedo(a) { }
@@ -35,6 +37,11 @@ class LambertianMaterial : public Material {
             )
 
             // here's an alternative diffuse method that is mentioned by the book as well
+            // which is based on just randomly reflecting in any direction away the the surface
+            // irrespective of how we got there or our angle to the normal
+            // although the difference creating random points in a hemisphere vs sphere seems simple,
+            // it affects the distribution of the output vectors (hemisphere leads to uniform, sphere is
+            // biased towards the normal)
             // auto reflectedRay = Ray(result.point, random_in_hemisphere(result.normal));
 
             scatteredRay = Ray(result.point, reflectedRayDirection);

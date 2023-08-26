@@ -62,6 +62,9 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
 
     for (std::unique_ptr<Hittable> const & object : objects) {
 
+        // the 0.00001 is a workaround for fixing "shadow acne"
+        // it essentially makes it so that if we collide with something really close, then we ignore it as it might've
+        // been a result of a rounding error during the previous collision calculation
         if (object->hit(ray, Interval(0.00001, maxRayLength), tmpHitResult)) {
             hitResult = tmpHitResult;
 
