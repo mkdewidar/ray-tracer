@@ -37,23 +37,27 @@ int main() {
     // camera
 
     auto fieldOfView = 90; // vertical
-    auto origin = Point3(-2, 2, 1);
+    auto cameraOrigin = Point3(3, 3, 2);
     auto cameraTarget = Point3(0, 0, -1);
 
     // the "z" axis of the camera
-    auto w = (origin - cameraTarget).unit();
+    auto w = (cameraOrigin - cameraTarget).unit();
     // the "x" axis of the camera
     // the cross product between up in the world, and "z" of the camera
     auto u = Vec3(0, 1, 0).cross(w).unit();
     // the "y" axis of the camera
     auto v = w.cross(u);
 
+    double aperture = 2.0;
+    double lensRadius = aperture / 2.0;
+
     std::clog << "Field Of View: " << fieldOfView << "\n"
-              << "Origin (center of viewport and camera position): " << origin << "\n"
+              << "Camera Origin: " << cameraOrigin << "\n"
               << "Camera pointing at: " << cameraTarget << "\n"
               << "Camera up: " << v << "\n"
               << "Camera right: " << u << "\n"
-              << "Camera back: " << w << "\n";
+              << "Camera back: " << w << "\n"
+              << "Aperture: " << aperture << "\n";
 
     // viewport
 
@@ -67,26 +71,26 @@ int main() {
     // casting one of the image dimensions to a double first ensures we use double division instead of int division,
     // and therefore aren't prematurely truncating any real numbers
     auto viewportWidth = (static_cast<double>(imageWidth) / imageHeight) * viewportHeight;
-    // the distance between the camera and the viewport
-    auto focalLength = 1.0;
+
+    auto focusDistance = (cameraOrigin - cameraTarget).length();
 
     std::clog << "Viewport width: " << viewportWidth << ", height: " << viewportHeight
-              << ", focal length: " << focalLength << "\n";
+              << ", focus distance: " << focusDistance << "\n";
 
     // a vector that's the same length as the viewport's width and points only
     // in the x axis for use later when traversing the scan lines
-    auto horizontal = viewportWidth * u;
+    auto horizontal = viewportWidth * u * focusDistance;
     // a vector that's the same length as the viewport's height and points only
     // in the y axis for use later when traversing the scan lines
-    auto vertical = viewportHeight * v;
+    auto vertical = viewportHeight * v * focusDistance;
     // lower left corner of viewport, in combination with the vectors above and
     // some other information in the rendering loop, we can traverse the viewport
     // from left to right, and up to down
-    auto lowerLeftCorner = origin - (horizontal / 2) - (vertical / 2) - (w * focalLength);
+    auto lowerLeftCorner = cameraOrigin - (horizontal / 2) - (vertical / 2) - (w * focusDistance);
 
-    std::clog << "Horizontal vector: " << horizontal
-              << "\nVertical vector: " << vertical
-              << "\nLower left corner: " << lowerLeftCorner << "\n";
+    std::clog << "Horizontal vector: " << horizontal << "\n"
+              << "Vertical vector: " << vertical << "\n"
+              << "Lower left corner: " << lowerLeftCorner << "\n";
 
     // Anti-aliasing samples per pixel
     auto const aaSamples = 10;
@@ -160,10 +164,15 @@ int main() {
                 // the point on the viewport we are currently rendering
                 double verticalScalar = (double(j) + random_double(0.0, 0.9)) / (imageHeight - 1);
 
-                // origin may not be zero (if camera moved location), but the direction
+                // to simulate depth of field, we have a disk lens from which light is sourced
+                Point3 pointOnLens = lensRadius * random_point_in_unit_disk();
+                Point3 pointOnLensOnCamera = (u * pointOnLens.x) + (v * pointOnLens.y);
+
+                // cameraOrigin may not be zero (if camera moved location), but the direction
                 // we would have calculated would be relative to true origin. The - origin
                 // at the end makes the direction relative to whatever the camera's location is
-                auto r = Ray(origin, lowerLeftCorner + (horizontalScalar * horizontal) + (verticalScalar * vertical) - origin);
+                auto r = Ray(cameraOrigin + pointOnLensOnCamera,
+                             lowerLeftCorner + (horizontalScalar * horizontal) + (verticalScalar * vertical) - cameraOrigin - pointOnLensOnCamera);
 
                 cumulativeColor = cumulativeColor + ray_color(r, objects, maxDepth);
             }

@@ -51,4 +51,13 @@ inline Vec3 random_in_hemisphere(Vec3 const & normal) {
     }
 }
 
+// generates a random point that falls within a disk of radius 1
+Point3 random_point_in_unit_disk() {
+    while (true) {
+        auto p = Point3(random_double(-1, 1), random_double(-1, 1), 0);
+        if (p.length_squared() >= 1.0) continue;
+        return p;
+    }
+}
+
 #endif
