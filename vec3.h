@@ -77,6 +77,12 @@ struct Vec3 {
     double dot(Vec3 const & right) const {
         return (this->x * right.x) + (this->y * right.y) + (this->z * right.z);
     }
+
+    Vec3 cross(Vec3 const & right) const {
+        return Vec3((this->y * right.z) - (this->z * right.y),
+                    (this->z * right.x) - (this->x * right.z),
+                    (this->x * right.y) - (this->y * right.x));
+    }
 };
 
 // specific overload for when constant is on the left hand side of the operator

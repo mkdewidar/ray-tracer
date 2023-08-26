@@ -16,6 +16,7 @@
 
 using namespace std::chrono_literals;
 
+double const PI = 3.1415926535897932385;
 
 //         ^ y
 //         |
@@ -28,42 +29,62 @@ int main() {
     // output image
     auto const aspectRatio = 16.0 / 9.0;
 
-    int const imageWidth = 400;
+    int const imageWidth = 1920;
     int const imageHeight = static_cast<int>(imageWidth / aspectRatio);
 
     std::clog << "Image width: " << imageWidth << ", height: " << imageHeight << "\n";
 
-    // viewport and camera
+    // camera
+
+    auto fieldOfView = 90; // vertical
+    auto origin = Point3(-2, 2, 1);
+    auto cameraTarget = Point3(0, 0, -1);
+
+    // the "z" axis of the camera
+    auto w = (origin - cameraTarget).unit();
+    // the "x" axis of the camera
+    // the cross product between up in the world, and "z" of the camera
+    auto u = Vec3(0, 1, 0).cross(w).unit();
+    // the "y" axis of the camera
+    auto v = w.cross(u);
+
+    std::clog << "Field Of View: " << fieldOfView << "\n"
+              << "Origin (center of viewport and camera position): " << origin << "\n"
+              << "Camera pointing at: " << cameraTarget << "\n"
+              << "Camera up: " << v << "\n"
+              << "Camera right: " << u << "\n"
+              << "Camera back: " << w << "\n";
+
+    // viewport
 
     // viewport is our window to the world, if you imagine looking through a window
     // or a pair of glasses, the viewport is the glass, and the camera is the eye
 
-    auto viewportHeight = 2.0;
+    // 2.0 * tan(vfov in radians / 2)
+    auto viewportHeight = 2.0 * (tan(fieldOfView * PI / 180.0 / 2));
     // we don't use aspectRatio because it might not be the real aspect ratio of the image, since the image's dimensions
     // are ints but the aspect ratio is a real number,
     // casting one of the image dimensions to a double first ensures we use double division instead of int division,
     // and therefore aren't prematurely truncating any real numbers
     auto viewportWidth = (static_cast<double>(imageWidth) / imageHeight) * viewportHeight;
-    // the distance between the eye and the glass
+    // the distance between the camera and the viewport
     auto focalLength = 1.0;
 
     std::clog << "Viewport width: " << viewportWidth << ", height: " << viewportHeight
               << ", focal length: " << focalLength << "\n";
 
-    auto origin = Point3(0, 0, 0);
     // a vector that's the same length as the viewport's width and points only
     // in the x axis for use later when traversing the scan lines
-    auto horizontal = Vec3(viewportWidth, 0, 0);
+    auto horizontal = viewportWidth * u;
     // a vector that's the same length as the viewport's height and points only
     // in the y axis for use later when traversing the scan lines
-    auto vertical = Vec3(0, viewportHeight, 0);
+    auto vertical = viewportHeight * v;
     // lower left corner of viewport, in combination with the vectors above and
     // some other information in the rendering loop, we can traverse the viewport
     // from left to right, and up to down
-    auto lowerLeftCorner = origin - horizontal/2 - vertical/2 - Vec3(0, 0, focalLength);
+    auto lowerLeftCorner = origin - (horizontal / 2) - (vertical / 2) - (w * focalLength);
 
-    std::clog << "Origin (center of viewport): " << origin
-              << "\nHorizontal vector: " << horizontal
+    std::clog << "Horizontal vector: " << horizontal
               << "\nVertical vector: " << vertical
               << "\nLower left corner: " << lowerLeftCorner << "\n";
 
@@ -88,7 +109,7 @@ int main() {
                                                std::make_shared<DielectricMaterial>(1.5)));
     // left sphere, again, this time its inside the other left sphere, and also is inside out (negative radius)
     objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
-                                               -0.4,
+                                               -0.45,
                                                std::make_shared<DielectricMaterial>(1.5)));
     // right sphere
     objects.push_back(std::make_unique<Sphere>(Vec3(1.0, 0.0, -1.0),
@@ -134,15 +155,15 @@ int main() {
 
                 // a scalar value that is used to shorten the "horizontal" vector to
                 // the point on the viewport we are currently rendering
-                double u = (double(i) + random_double(0.0, 0.9)) / (imageWidth - 1);
+                double horizontalScalar = (double(i) + random_double(0.0, 0.9)) / (imageWidth - 1);
                 // a scalar value that is used to shorten the "vertical" vector to
                 // the point on the viewport we are currently rendering
-                double v = (double(j) + random_double(0.0, 0.9)) / (imageHeight - 1);
+                double verticalScalar = (double(j) + random_double(0.0, 0.9)) / (imageHeight - 1);
 
                 // origin may not be zero (if camera moved location), but the direction
                 // we would have calculated would be relative to true origin. The - origin
                 // at the end makes the direction relative to whatever the camera's location is
-                auto r = Ray(origin, lowerLeftCorner + (u * horizontal) + (v * vertical) - origin);
+                auto r = Ray(origin, lowerLeftCorner + (horizontalScalar * horizontal) + (verticalScalar * vertical) - origin);
 
                 cumulativeColor = cumulativeColor + ray_color(r, objects, maxDepth);
             }
