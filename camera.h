@@ -15,12 +15,22 @@ class Camera {
         int imageHeight = static_cast<int>(imageWidth / aspectRatio);
 
         int fieldOfView = 90; // vertical
+
+        // the next three variables control the camera's position and rotation by controlling where its
+        // looking and what is considered "up"
+
         // camera location in the world
         Point3 cameraOrigin = Point3(3, 0, 2);
-        // the point that the camera origin is "looking" at
+        // the point that the camera origin is "looking" at, this point is on the "focus plane" and will
+        // have perfect focus if depth of field is used
         Point3 cameraTarget = Point3(0, 0, -1);
+        // the up vector for the camera that decides how much the camera is rotated along the Z axis
+        // 0,1,0 means "up" for the camera matches "up" in the world so camera is not tilted
+        Vec3 cameraViewUp = Vec3(0, 1, 0);
 
-        double aperture = 2.0;
+        // the aperture of the lens i.e diameter of the lens,
+        // 0 means no depth of field and everything is in perfect focus
+        double aperture = 0;
 
         // Anti-aliasing samples per pixel
         int aaSamples = 10;
@@ -30,6 +40,8 @@ class Camera {
         void render(std::vector<std::unique_ptr<Hittable>> & world, void (*postInitialize) (Camera const &), void (*writeColorCallback) (Color const &));
 
     private:
+        // u, v, w are camera axis, which are different from the world axis if the camera is rotated
+
         // the "z" axis of the camera
         Vec3 _w;
         // the "x" axis of the camera
@@ -45,6 +57,8 @@ class Camera {
 
         double _viewportHeight;
         double _viewportWidth;
+        // the distance between the camera lens and the plane at which objects will be in focus (focus plane)
+        // since the viewport is basically the focus plane, this is the distance to the viewport
         double _focusDistance;
 
         // a vector that's the same length as the viewport's width and points only
@@ -137,8 +151,11 @@ Ray Camera::get_ray(int i, int j) const {
 void Camera::initialize() {
     std::clog << "Image width: " << imageWidth << ", height: " << imageHeight << ", aspect ratio: " << aspectRatio << "\n";
 
+    // w is the opposite of where we're looking (to be consistent with same right hand system as world)
     _w = (cameraOrigin - cameraTarget).unit();
-    _u = Vec3(0, 1, 0).cross(_w).unit();
+    // u is perpendicular to both "up" and w
+    _u = cameraViewUp.cross(_w).unit();
+    // v is perpendicular to both u and w
     _v = _w.cross(_u);
 
     std::clog << "Field Of View: " << fieldOfView << "\n"
