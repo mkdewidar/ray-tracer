@@ -180,9 +180,9 @@ int main() {
             // this "gamma corrects" the colors, which I don't really understand
             // and my image was already lighter than the guide for some reason
             auto gammaCorrected = Color(
-                sqrt(cumulativeColor.r() / aaSamples),
-                sqrt(cumulativeColor.g() / aaSamples),
-                sqrt(cumulativeColor.b() / aaSamples));
+                sqrt(cumulativeColor.r / aaSamples),
+                sqrt(cumulativeColor.g / aaSamples),
+                sqrt(cumulativeColor.b / aaSamples));
 
             write_color(std::cout, gammaCorrected);
         }

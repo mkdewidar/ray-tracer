@@ -6,75 +6,70 @@
 
 #include "logger.h"
 
-struct Color {
-    Color() : _r(0), _g(0), _b(0) { }
+class Color {
+    public:
+        double r;
+        double g;
+        double b;
 
-    Color(double red, double green, double blue)
-        : _r(red), _g(green), _b(blue) { }
+        Color();
 
-    inline Color operator+(Color const & right) const {
-        return Color(this->_r + right.r(), this->_g + right.g(), this->_b + right.b());
-    }
+        Color(double red, double green, double blue);
 
-    inline Color operator-(Color const & right) const {
-        return Color(this->_r - right.r(), this->_g - right.g(), this->_b - right.b());
-    }
+        Color operator+(Color const & right) const;
 
-    inline Color operator*(double const constant) const {
-        return Color(constant * this->_r, constant * this->_g, constant * this->_b);
-    }
+        Color operator-(Color const & right) const;
 
-    inline Color operator*(Color const & right) const {
-        return Color(this->_r * right.r(), this->_g * right.g(), this->_b * right.b());
-    }
+        Color operator*(double const constant) const;
 
-    inline Color operator/(double const constant) const {
-        return Color(this->_r / constant, this->_g / constant, this->_b / constant);
-    }
+        Color operator*(Color const & right) const;
 
-    inline double r() const {
-        return this->_r;
-    }
-
-    inline double g() const {
-        return this->_g;
-    }
-
-    inline double b() const {
-        return this->_b;
-    }
-
-    inline void r(double red) {
-        this->_r = red;
-    }
-
-    inline void g(double green) {
-        this->_g = green;
-    }
-
-    inline void b(double blue) {
-        this->_b = blue;
-    }
-
-private:
-    double _r;
-    double _g;
-    double _b;
+        Color operator/(double const constant) const;
 };
+
+Color operator*(double left, Color const & right);
+
+void write_color(std::ostream & output, Color const & c);
+
+// ------
+
+Color::Color() : r(0), g(0), b(0) { }
+
+Color::Color(double red, double green, double blue) : r(red), g(green), b(blue) { }
+
+Color Color::operator+(Color const & right) const {
+    return Color(this->r + right.r, this->g + right.g, this->b + right.b);
+}
+
+Color Color::operator-(Color const & right) const {
+    return Color(this->r - right.r, this->g - right.g, this->b - right.b);
+}
+
+Color Color::operator*(double const constant) const {
+    return Color(constant * this->r, constant * this->g, constant * this->b);
+}
+
+Color Color::operator*(Color const & right) const {
+    return Color(this->r * right.r, this->g * right.g, this->b * right.b);
+}
+
+Color Color::operator/(double const constant) const {
+    return Color(this->r / constant, this->g / constant, this->b / constant);
+}
 
 // specific overload for when constant is on the left hand side of the operator
 // so technically this is an overload for double
-inline Color operator*(double const left, Color const & right) {
+Color operator*(double left, Color const & right) {
     return right * left;
 }
 
 void write_color(std::ostream & output, Color const & c) {
-    int R = static_cast<int>(c.r() * 255.999); // the .999 allows us
-    int G = static_cast<int>(c.g() * 255.999); // to make sure 256 is
-    int B = static_cast<int>(c.b() * 255.999); // as likely to occur as other colors
+    int R = static_cast<int>(c.r * 255.999); // the .999 allows us
+    int G = static_cast<int>(c.g * 255.999); // to make sure 256 is
+    int B = static_cast<int>(c.b * 255.999); // as likely to occur as other colors
 
     LOG(
-        std::clog << "Raw color: " << c.r() << " " << c.g() << " " << c.b() << "\n";
+        std::clog << "Raw color: " << c.r << " " << c.g << " " << c.b << "\n";
         std::clog << "Actual color: " << R << " " << G << " " << B << "\n";
     )
 
