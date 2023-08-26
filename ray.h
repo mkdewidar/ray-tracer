@@ -12,19 +12,29 @@ class Ray {
         Vec3 orig;
         Vec3 dir;
 
-        Ray() : orig(), dir() { }
+        Ray();
 
-        Ray(Vec3 const & origin, Vec3 const & direction)
-            : orig(origin), dir(direction) { }
+        Ray(Vec3 const & origin, Vec3 const & direction);
 
-        Vec3 at(double const t) const {
-            return orig + t * dir;
-        }
+        Vec3 at(double const t) const;
 };
 
 #include "hittable.h"
 #include "material.h"
 
+Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects, int depth);
+
+// ------
+
+Ray::Ray() : orig(), dir() { }
+
+Ray::Ray(Vec3 const & origin, Vec3 const & direction) : orig(origin), dir(direction) { }
+
+Vec3 Ray::at(double const t) const {
+    return orig + t * dir;
+}
+
+// shoot the ray into the world of objects, and find the color that would be seen from the source of the ray
 Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects, int depth) {
 
     LOG(
@@ -37,12 +47,13 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
         return Color(0, 0, 0);
     }
 
-    double max_ray_length = std::numeric_limits<double>::infinity(); // essentially our view distance
+    double maxRayLength = std::numeric_limits<double>::infinity(); // essentially our view distance
 
-    bool hit_anything = false;
+    bool didHitAnything = false;
 
     auto hitResult = HitResult();
 
+    // for use inside the loop as an output parameter to the hit function
     auto tmpHitResult = HitResult();
 
     LOG(
@@ -50,16 +61,15 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
     )
 
     for (std::unique_ptr<Hittable> const & object : objects) {
-        // for use inside the loop as an output parameter to the hit function
 
-        if (object->hit(ray, 0.00001, max_ray_length, tmpHitResult)) {
+        if (object->hit(ray, 0.00001, maxRayLength, tmpHitResult)) {
             hitResult = tmpHitResult;
 
             // the t for object becomes our new max length of the ray
             // allowing us to ensure we pick the color of objects that are closest to us
-            max_ray_length = hitResult.t;
+            maxRayLength = hitResult.t;
 
-            hit_anything = true;
+            didHitAnything = true;
             LOG(
                 std::clog << "Ray hit object " << object << " with t = " << hitResult.t << ", front face: " << hitResult.front_face << "\n";
                 std::clog << "Normal: " << hitResult.normal.x << " " << hitResult.normal.y << " " << hitResult.normal.z << "\n";
@@ -67,7 +77,7 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
         }
     }
 
-    if (hit_anything) {
+    if (didHitAnything) {
         Ray scatteredRay;
         Color attenuation;
 
