@@ -15,6 +15,8 @@ class Interval {
 
         bool surrounds(double x) const;
 
+        double clamp(double x) const;
+
         static Interval const empty, universe;
 };
 
@@ -36,6 +38,12 @@ bool Interval::contains(double x) const {
 // same as contains but exclusive
 bool Interval::surrounds(double x) const {
     return (this->min < x) && (x < this->max);
+}
+
+double Interval::clamp(double x) const {
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;
 }
 
 #endif

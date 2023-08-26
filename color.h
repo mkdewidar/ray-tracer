@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "logger.h"
+#include "interval.h"
 
 class Color {
     public:
@@ -64,9 +65,12 @@ Color operator*(double left, Color const & right) {
 }
 
 void write_color(std::ostream & output, Color const & c) {
-    int R = static_cast<int>(c.r * 255.999); // the .999 allows us
-    int G = static_cast<int>(c.g * 255.999); // to make sure 256 is
-    int B = static_cast<int>(c.b * 255.999); // as likely to occur as other colors
+    auto intensityLimit = Interval(0.000000, 0.999999);
+
+    // don't want to actually get 256 as a color value, we want to stop at 255
+    int R = static_cast<int>(intensityLimit.clamp(c.r) * 256);
+    int G = static_cast<int>(intensityLimit.clamp(c.g) * 256);
+    int B = static_cast<int>(intensityLimit.clamp(c.b) * 256);
 
     LOG(
         std::clog << "Raw color: " << c.r << " " << c.g << " " << c.b << "\n";
