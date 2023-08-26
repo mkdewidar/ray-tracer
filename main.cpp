@@ -35,25 +35,59 @@ int main() {
     auto objects = std::vector<std::unique_ptr<Hittable>>();
 
     // ground
-    objects.push_back(std::make_unique<Sphere>(Vec3(0.0, -100.5, -1.0),
-                                               100.0,
-                                               std::make_shared<LambertianMaterial>(Color(0.8, 0.8, 0.0))));
-    // center sphere
-    objects.push_back(std::make_unique<Sphere>(Vec3(0.0, 0.0, -1.0),
-                                               0.5,
-                                               std::make_shared<LambertianMaterial>(Color(0.7, 0.3, 0.3))));
-    // left sphere
-    objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
-                                               0.5,
+    objects.push_back(std::make_unique<Sphere>(Point3(0.0, -1000, 0),
+                                               1000,
+                                               std::make_shared<LambertianMaterial>(Color(0.5, 0.5, 0.5))));
+
+    for (int x = -11; x < 11; x++) {
+        for (int z = -11; z < 11; z++) {
+            auto randomMaterialChoice = random_double();
+            auto sphereCenter = Point3(x + (0.9 * random_double()), 0.2, z + (0.9 * random_double()));
+
+            if ((sphereCenter - Point3(4, 0.2, 0)).length() > 0.9) {
+                std::shared_ptr<Material> randomizedMaterial;
+
+                if (randomMaterialChoice < 0.8) {
+                    // diffuse
+                    randomizedMaterial = std::make_shared<LambertianMaterial>(Color::random());
+                } else if (randomMaterialChoice < 0.95) {
+                    // metal
+                    randomizedMaterial = std::make_shared<MetalMaterial>(Color::random(0.5, 1), random_double(0, 0.5));
+                } else {
+                    // glass
+                    randomizedMaterial = std::make_shared<DielectricMaterial>(1.5);
+                }
+
+                objects.push_back(std::make_unique<Sphere>(sphereCenter,
+                                                           0.2,
+                                                           randomizedMaterial));
+            }
+        }
+    }
+
+    // dielectric bubble
+    // two dielectrics inside each other, with the one inside being "inside out"
+    objects.push_back(std::make_unique<Sphere>(Point3(-8, 1, 0),
+                                               1,
                                                std::make_shared<DielectricMaterial>(1.5)));
-    // left sphere, again, this time its inside the other left sphere, and also is inside out (negative radius)
-    objects.push_back(std::make_unique<Sphere>(Vec3(-1.0, 0.0, -1.0),
-                                               -0.45,
+    objects.push_back(std::make_unique<Sphere>(Point3(-8, 1, 0),
+                                               -0.95,
                                                std::make_shared<DielectricMaterial>(1.5)));
-    // right sphere
-    objects.push_back(std::make_unique<Sphere>(Vec3(1.0, 0.0, -1.0),
-                                               0.5,
-                                               std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2), 1.0)));
+
+    // diffuse
+    objects.push_back(std::make_unique<Sphere>(Point3(-4, 1, 0),
+                                               1,
+                                               std::make_shared<LambertianMaterial>(Color(0.4, 0.2, 0.1))));
+
+    // dielectric
+    objects.push_back(std::make_unique<Sphere>(Point3(0, 1, 0),
+                                               1,
+                                               std::make_shared<DielectricMaterial>(1.5)));
+
+    // metallic
+    objects.push_back(std::make_unique<Sphere>(Vec3(4, 1, 0),
+                                               1,
+                                               std::make_shared<MetalMaterial>(Color(0.7, 0.6, 0.5), 0)));
 
     std::clog << "World contains objects: \n";
     for (auto & obj : objects) {
@@ -62,6 +96,10 @@ int main() {
     std::clog << "\n" << std::flush;
 
     Camera camera = Camera();
+
+    camera.cameraOrigin = Point3(7, 2, 6);
+    camera.cameraTarget = Point3(0, 0, 0);
+
     camera.render(objects, post_initialize, write_ppm_color);
 
     return 0;

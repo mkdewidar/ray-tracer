@@ -6,6 +6,7 @@
 
 #include "logger.h"
 #include "interval.h"
+#include "random.h"
 
 class Color {
     public:
@@ -26,6 +27,10 @@ class Color {
         Color operator*(Color const & right) const;
 
         Color operator/(double const constant) const;
+
+        static Color random();
+
+        static Color random(double min, double max);
 };
 
 Color operator*(double left, Color const & right);
@@ -56,6 +61,14 @@ Color Color::operator*(Color const & right) const {
 
 Color Color::operator/(double const constant) const {
     return Color(this->r / constant, this->g / constant, this->b / constant);
+}
+
+Color Color::random() {
+    return Color(random_double(), random_double(), random_double());
+}
+
+Color Color::random(double min, double max) {
+    return Color(random_double(min, max), random_double(min, max), random_double(min, max));
 }
 
 // specific overload for when constant is on the left hand side of the operator
