@@ -27,7 +27,7 @@ class LambertianMaterial : public Material {
             auto reflectedRayDirection = result.normal + random_unit_vec3();
 
             // in case the randomly generated vector matches the normal and cancels it out
-            if (reflectedRayDirection.near_zero())
+            if (reflectedRayDirection.is_near_zero())
                 reflectedRayDirection = result.normal;
 
             LOG(

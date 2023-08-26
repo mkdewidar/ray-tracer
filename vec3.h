@@ -30,7 +30,7 @@ class Vec3 {
 
         Vec3 unit() const;
 
-        bool near_zero() const;
+        bool is_near_zero() const;
 
         Vec3 reflect(Vec3 const & normal);
 
@@ -85,7 +85,7 @@ Vec3 Vec3::unit() const {
     return *this / this->length();
 }
 
-bool Vec3::near_zero() const {
+bool Vec3::is_near_zero() const {
     auto const granularity = 1e-8;
     return (fabs(x) < granularity) && (fabs(y) < granularity) && (fabs(z) < granularity);
 }
