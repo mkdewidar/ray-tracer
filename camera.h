@@ -12,7 +12,7 @@ class Camera {
     public:
         double aspectRatio = 16.0 / 9.0;
         int imageWidth = 1920;
-        int imageHeight = static_cast<int>(imageWidth / aspectRatio);
+        int imageHeight;
 
         int fieldOfView = 90; // vertical
 
@@ -149,6 +149,8 @@ Ray Camera::get_ray(int i, int j) const {
 }
 
 void Camera::initialize() {
+    imageHeight = static_cast<int>(imageWidth / aspectRatio);
+
     std::clog << "Image width: " << imageWidth << ", height: " << imageHeight << ", aspect ratio: " << aspectRatio << "\n";
 
     // w is the opposite of where we're looking (to be consistent with same right hand system as world)
