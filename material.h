@@ -16,6 +16,8 @@ class Material {
 // Lambertian diffuse material
 // an approach for modelling diffuse surfaces that includes bouncing rays that intersect with the object
 // at angles that are closer to the normal
+// technically with diffuse materials the incoming ray could reflect or get absorbed, in this case
+// we just always reflect.
 class LambertianMaterial : public Material {
     public:
         LambertianMaterial(Color const & a) : albedo(a) { }
@@ -54,7 +56,8 @@ class LambertianMaterial : public Material {
         Color albedo;
 };
 
-// Shiny metallic material
+// Shiny metallic material implementation that relies on modelling the ray reflecting across the surface normal.
+// Optionally, with a non-zero fuzz value, the reflection can be "imperfect" causing fuzziness in the reflection
 class MetalMaterial : public Material {
     public:
         MetalMaterial(Color const & a, double const f) : albedo(a), fuzz(f < 1 ? f : 1) { }
@@ -62,6 +65,8 @@ class MetalMaterial : public Material {
         virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const override {
             auto reflectedRayDirection = incomingRay.dir.unit().reflect(result.normal);
 
+            // imagine the sphere around the "end" of the reflected ray, and the fuzz controls how much of the vector
+            // we get from the sphere do we use to skew the reflected ray
             scatteredRay = Ray(result.point, reflectedRayDirection + (fuzz * random_unit_vec3_in_unit_sphere()));
             attenuation = this->albedo;
 

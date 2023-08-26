@@ -107,8 +107,9 @@ Vec3 Vec3::reflect(Vec3 const & normal) {
 // NOTE: "this" vector must be a unit vector when you use this function on it
 Vec3 Vec3::refract(Vec3 const & normal, double const refractiveIndexRatio) {
     Vec3 thisVec = *this;
+
     // the component of the refracted vector that is perpendicular to the normal
-    Vec3 refractedVectorPerp = (thisVec + (fmin((-thisVec).dot(normal), 1.0) * normal)) * refractiveIndexRatio;
+    Vec3 refractedVectorPerp = refractiveIndexRatio * (thisVec + (fmin((-thisVec).dot(normal), 1.0) * normal));
     // the component of the refracted vector that is parallel to the normal
     Vec3 refractedVectorParallel = -sqrt(fabs(1.0 - refractedVectorPerp.length_squared())) * normal;
     return refractedVectorParallel + refractedVectorPerp;
