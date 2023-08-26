@@ -59,6 +59,7 @@ int main() {
                 }
 
                 objects.push_back(std::make_unique<Sphere>(sphereCenter,
+                                                           sphereCenter + Point3(0, random_double(0, 0.5), 0),
                                                            0.2,
                                                            randomizedMaterial));
             }

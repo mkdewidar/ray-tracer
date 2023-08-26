@@ -46,7 +46,7 @@ class LambertianMaterial : public Material {
             // biased towards the normal)
             // auto reflectedRay = Ray(result.point, random_in_hemisphere(result.normal));
 
-            scatteredRay = Ray(result.point, reflectedRayDirection);
+            scatteredRay = Ray(result.point, reflectedRayDirection, incomingRay.time);
             attenuation = this->albedo;
 
             return true;
@@ -67,7 +67,7 @@ class MetalMaterial : public Material {
 
             // imagine the sphere around the "end" of the reflected ray, and the fuzz controls how much of the vector
             // we get from the sphere do we use to skew the reflected ray
-            scatteredRay = Ray(result.point, reflectedRayDirection + (fuzz * random_unit_vec3_in_unit_sphere()));
+            scatteredRay = Ray(result.point, reflectedRayDirection + (fuzz * random_unit_vec3_in_unit_sphere()), incomingRay.time);
             attenuation = this->albedo;
 
             LOG(
@@ -113,7 +113,7 @@ class DielectricMaterial : public Material {
                 outVector = incomingRayDirUnit.refract(result.normal, refractionIndexRatio);
             }
 
-            scatteredRay = Ray(result.point, outVector);
+            scatteredRay = Ray(result.point, outVector, incomingRay.time);
             return true;
         }
 

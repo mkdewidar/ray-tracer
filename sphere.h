@@ -9,11 +9,15 @@ class Sphere : public Hittable {
 
 public:
     Point3 center;
+    // a vector that when added to the center gives the end position of the sphere
+    Vec3 motionVector;
     double radius;
     std::shared_ptr<Material> material;
 
     Sphere();
     Sphere(Point3 c, double r, std::shared_ptr<Material> m);
+    // for representing a moving sphere, endC is the end position of the center at the end of time
+    Sphere(Point3 c, Point3 endC, double r, std::shared_ptr<Material> m);
 
     virtual bool hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const override;
 
@@ -23,6 +27,8 @@ public:
 
 Sphere::Sphere() { }
 Sphere::Sphere(Point3 c, double r, std::shared_ptr<Material> m) : center(c), radius(r), material(m) { }
+Sphere::Sphere(Point3 c, Point3 endC, double r, std::shared_ptr<Material> m)
+              : center(c), motionVector(endC - center), radius(r), material(m) {}
 
 // a sphere is described using the equation x^2 + y^2 + z^2 = r^2
 // meanwhile, r can also be described as the magnitidue of the vector P - C
@@ -54,7 +60,10 @@ Sphere::Sphere(Point3 c, double r, std::shared_ptr<Material> m) : center(c), rad
 // of t there are for a given instance of the equation. this allows us to tell
 // whether the ray intersects the sphere at multiple points or just one or none.
 bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const {
-    Vec3 aMinusC = ray.orig - this->center; // A - C, which is used multiple times below so just do it once
+    // use time to interpolate between start and end position of the sphere
+    Point3 currentCenter = this->center + (ray.time * motionVector);
+
+    Vec3 aMinusC = ray.orig - currentCenter; // A - C, which is used multiple times below so just do it once
 
     auto a = ray.dir.length_squared(); // OPTIMISATION: B.B is the same as length of B squared
     // OPTIMISATION: since b = 2 * B.(A - C), the 2 actually gets
@@ -77,7 +86,7 @@ bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result
         if (rayLimits.contains(root)) {
             result.t = root;
             result.point = ray.at(result.t);
-            result.set_face_normal(ray, (result.point - this->center) / this->radius);
+            result.set_face_normal(ray, (result.point - currentCenter) / this->radius);
             result.material = this->material;
 
             LOG(
@@ -95,7 +104,7 @@ bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result
         if (rayLimits.contains(root)) {
             result.t = root;
             result.point = ray.at(result.t);
-            result.set_face_normal(ray, (result.point - this->center) / this->radius);
+            result.set_face_normal(ray, (result.point - currentCenter) / this->radius);
             result.material = this->material;
 
             LOG(

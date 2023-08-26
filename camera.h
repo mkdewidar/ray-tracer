@@ -145,7 +145,8 @@ Ray Camera::get_ray(int i, int j) const {
     // we would have calculated would be relative to true origin. The - origin
     // at the end makes the direction relative to whatever the camera's location is
     return Ray(cameraOrigin + pointOnLensOnCamera,
-               _lowerLeftCorner + (horizontalScalar * _horizontal) + (verticalScalar * _vertical) - cameraOrigin - pointOnLensOnCamera);
+               _lowerLeftCorner + (horizontalScalar * _horizontal) + (verticalScalar * _vertical) - cameraOrigin - pointOnLensOnCamera,
+               random_double(0, 1)); // randomising the moment in time that we're rendering is good enough for motion blur
 }
 
 void Camera::initialize() {

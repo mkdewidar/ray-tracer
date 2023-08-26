@@ -11,10 +11,11 @@ class Ray {
     public:
         Vec3 orig;
         Vec3 dir;
+        double time;
 
         Ray();
 
-        Ray(Vec3 const & origin, Vec3 const & direction);
+        Ray(Vec3 const & origin, Vec3 const & direction, double time = 0);
 
         Vec3 at(double const t) const;
 };
@@ -26,9 +27,9 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
 
 // ------
 
-Ray::Ray() : orig(), dir() { }
+Ray::Ray() : orig(), dir(), time(0) { }
 
-Ray::Ray(Vec3 const & origin, Vec3 const & direction) : orig(origin), dir(direction) { }
+Ray::Ray(Vec3 const & origin, Vec3 const & direction, double time) : orig(origin), dir(direction), time(time) { }
 
 Vec3 Ray::at(double const t) const {
     return orig + t * dir;
