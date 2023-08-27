@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "ray.h"
 #include "interval.h"
+#include "aabb.h"
 
 class Material;
 
@@ -30,6 +31,9 @@ class Hittable {
         // are returned in the "result" parameter
         // rayLimits controls how far the ray can go
         virtual bool hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const = 0;
+
+        // override this to define a bounding box for this hittable that can be used for BVH calculations
+        virtual Aabb bounding_box() const = 0;
 };
 
 // ------

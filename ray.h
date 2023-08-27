@@ -23,7 +23,7 @@ class Ray {
 #include "hittable.h"
 #include "material.h"
 
-Color ray_color(Ray const & ray, Hittable const & world, int depth);
+Color ray_color(Ray const & ray, std::shared_ptr<Hittable> const & world, int depth);
 
 // ------
 
@@ -36,7 +36,7 @@ Vec3 Ray::at(double const t) const {
 }
 
 // shoot the ray into the world of objects, and find the color that would be seen from the source of the ray
-Color ray_color(Ray const & ray, Hittable const & world, int depth) {
+Color ray_color(Ray const & ray, std::shared_ptr<Hittable> const & world, int depth) {
 
     LOG(
         std::clog << "Bounce number " << depth << "\n";
@@ -59,7 +59,7 @@ Color ray_color(Ray const & ray, Hittable const & world, int depth) {
     // the 0.00001 is a workaround for fixing "shadow acne"
     // it essentially makes it so that if we collide with something really close, then we ignore it as it might've
     // been a result of a rounding error during the previous collision calculation
-    if (world.hit(ray, Interval(0.00001, maxRayLength), hitResult)) {
+    if (world->hit(ray, Interval(0.00001, maxRayLength), hitResult)) {
         Ray scatteredRay;
         Color attenuation;
 

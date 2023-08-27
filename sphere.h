@@ -4,6 +4,7 @@
 #include "ray.h"
 #include "vec3.h"
 #include "hittable.h"
+#include "aabb.h"
 
 class Sphere : public Hittable {
 
@@ -13,6 +14,7 @@ public:
     Vec3 motionVector;
     double radius;
     std::shared_ptr<Material> material;
+    Aabb boundingBox;
 
     Sphere();
     Sphere(Point3 c, double r, std::shared_ptr<Material> m);
@@ -21,14 +23,25 @@ public:
 
     virtual bool hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const override;
 
+    virtual Aabb bounding_box() const override;
 };
 
 // ------
 
 Sphere::Sphere() { }
-Sphere::Sphere(Point3 c, double r, std::shared_ptr<Material> m) : center(c), radius(r), material(m) { }
+Sphere::Sphere(Point3 c, double r, std::shared_ptr<Material> m) : center(c), radius(r), material(m) {
+    auto radiusVector = Vec3(radius, radius, radius);
+    this->boundingBox = Aabb(center - radiusVector, center + radiusVector);
+}
 Sphere::Sphere(Point3 c, Point3 endC, double r, std::shared_ptr<Material> m)
-              : center(c), motionVector(endC - center), radius(r), material(m) {}
+              : center(c), motionVector(endC - center), radius(r), material(m) {
+    auto radiusVector = Vec3(radius, radius, radius);
+
+    auto startSphereBoundingBox = Aabb(center - radiusVector, center + radiusVector);
+    auto endSphereBoundingBox = Aabb(endC - radiusVector, endC + radiusVector);
+
+    this->boundingBox = Aabb(startSphereBoundingBox, endSphereBoundingBox);
+}
 
 // a sphere is described using the equation x^2 + y^2 + z^2 = r^2
 // meanwhile, r can also be described as the magnitidue of the vector P - C
@@ -115,6 +128,10 @@ bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result
     }
 
     return false;
+}
+
+Aabb Sphere::bounding_box() const {
+    return this->boundingBox;
 }
 
 #endif

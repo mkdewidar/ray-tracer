@@ -5,11 +5,13 @@
 #include <vector>
 
 #include "hittable.h"
+#include "aabb.h"
 
 // a container for hittable objects
 class HittableList : public Hittable {
     public:
         std::vector<std::shared_ptr<Hittable>> objects;
+        Aabb boundingBox;
 
         HittableList();
         HittableList(std::shared_ptr<Hittable> objects);
@@ -19,13 +21,16 @@ class HittableList : public Hittable {
         void add(std::shared_ptr<Hittable> object);
 
         bool hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const override;
+
+        Aabb bounding_box() const override;
 };
 
 std::ostream & operator<<(std::ostream & out, HittableList const & list);
 
 // ------
 
-HittableList::HittableList() { }
+HittableList::HittableList() : objects(), boundingBox() { }
+
 HittableList::HittableList(std::shared_ptr<Hittable> object) {
     add(object);
 }
@@ -36,6 +41,7 @@ void HittableList::clear() {
 
 void HittableList::add(std::shared_ptr<Hittable> object) {
     this->objects.push_back(object);
+    this->boundingBox = Aabb(this->boundingBox, object->bounding_box());
 }
 
 bool HittableList::hit(Ray const & ray, Interval const & rayLimits, HitResult & result) const {
@@ -64,6 +70,10 @@ bool HittableList::hit(Ray const & ray, Interval const & rayLimits, HitResult & 
     }
 
     return didHitAnything;
+}
+
+Aabb HittableList::bounding_box() const {
+    return this->boundingBox;
 }
 
 std::ostream & operator<<(std::ostream & out, HittableList const & list) {

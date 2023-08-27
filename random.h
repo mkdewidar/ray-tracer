@@ -13,6 +13,10 @@ inline double random_double(double min, double max) {
     return min + ((max - min) * random_double());
 }
 
+inline double random_int(int min, int max) {
+    return static_cast<int>(random_double(min, max + 1));
+}
+
 // a unit sphere is a sphere with radius 1, so basically this creates a random
 // unit vector where x, y and z could range between -1 and 1
 //

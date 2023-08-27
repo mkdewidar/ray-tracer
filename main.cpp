@@ -1,7 +1,6 @@
 #include <iostream>
 #include <thread>
 
-
 #include "vec3.h"
 #include "color.h"
 #include "random.h"
@@ -12,6 +11,8 @@
 #include "material.h"
 #include "sphere.h"
 #include "hittable_list.h"
+#include "aabb.h"
+#include "bvh_node.h"
 
 #include "camera.h"
 
@@ -100,7 +101,7 @@ int main() {
     camera.cameraOrigin = Point3(7, 2, 6);
     camera.cameraTarget = Point3(0, 0, 0);
 
-    camera.render(world, post_initialize, write_ppm_color);
+    camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 
     return 0;
 }
