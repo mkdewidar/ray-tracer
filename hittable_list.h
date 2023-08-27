@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "hittable.h"
+#include "quad.h"
 #include "aabb.h"
 
 // a container for hittable objects
@@ -26,6 +27,8 @@ class HittableList : public Hittable {
 };
 
 std::ostream & operator<<(std::ostream & out, HittableList const & list);
+
+std::shared_ptr<HittableList> make_box(Point3 const & a, Point3 const & b, Color const & color);
 
 // ------
 
@@ -82,6 +85,32 @@ std::ostream & operator<<(std::ostream & out, HittableList const & list) {
     }
 
     return out;
+}
+
+std::shared_ptr<HittableList> make_box(Point3 const & a, Point3 const & b, std::shared_ptr<LambertianMaterial> const & material) {
+    auto sides = std::make_shared<HittableList>();
+
+    auto minPoint = Point3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z));
+    auto maxPoint = Point3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z));
+
+    Vec3 xVector = Vec3(maxPoint.x - minPoint.x, 0, 0);
+    Vec3 yVector = Vec3(0, maxPoint.y - minPoint.y, 0);
+    Vec3 zVector = Vec3(0, 0, maxPoint.z - minPoint.z);
+
+    // top
+    sides->add(std::make_shared<Quad>(minPoint + yVector + zVector, xVector, -zVector, material));
+    // bottom
+    sides->add(std::make_shared<Quad>(minPoint, xVector, zVector, material));
+    // left
+    sides->add(std::make_shared<Quad>(minPoint, zVector, yVector, material));
+    // right
+    sides->add(std::make_shared<Quad>(maxPoint - yVector, -zVector, yVector, material));
+    // back
+    sides->add(std::make_shared<Quad>(minPoint + xVector, -xVector, yVector, material));
+    // front
+    sides->add(std::make_shared<Quad>(minPoint + zVector, xVector, yVector, material));
+
+    return sides;
 }
 
 #endif

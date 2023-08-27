@@ -205,6 +205,7 @@ void cornell_box() {
     auto green = std::make_shared<LambertianMaterial>(Color(0.12, 0.45, 0.15));
     auto light = std::make_shared<DiffuseLightMaterial>(Color(15, 15, 15));
 
+    // walls
     world.add(std::make_shared<Quad>(Point3(555, 0, 0),
                                      Vec3(0, 555, 0),
                                      Vec3(0, 0, 555),
@@ -230,6 +231,10 @@ void cornell_box() {
                                      Vec3(0, 555, 0),
                                      white));
 
+    // boxes
+    world.add(make_box(Point3(130, 0, 65), Point3(295, 165, 230), white));
+    world.add(make_box(Point3(265, 0, 295), Point3(430, 330, 460), white));
+
     std::clog << "World contains objects: \n"
               << world
               << "\n" << std::flush;
@@ -241,6 +246,7 @@ void cornell_box() {
     camera.fieldOfView = 40;
     camera.cameraOrigin = Point3(278, 278, -800);
     camera.cameraTarget = Point3(278, 278, 0);
+    camera.aaSamples = 50;
     camera.backgroundColor = Color(0, 0, 0);
 
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
