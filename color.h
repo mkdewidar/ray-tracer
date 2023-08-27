@@ -35,6 +35,8 @@ class Color {
 
 Color operator*(double left, Color const & right);
 
+std::ostream & operator<<(std::ostream & out, Color const & c);
+
 void write_color(std::ostream & output, Color const & c);
 
 // ------
@@ -75,6 +77,10 @@ Color Color::random(double min, double max) {
 // so technically this is an overload for double
 Color operator*(double left, Color const & right) {
     return right * left;
+}
+
+std::ostream & operator<<(std::ostream & out, Color const & c) {
+    return out << c.r << " " << c.g << " " << c.b;
 }
 
 void write_color(std::ostream & output, Color const & c) {

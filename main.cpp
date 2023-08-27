@@ -124,11 +124,9 @@ void two_spheres() {
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
 
-
 void quads() {
     auto world = HittableList();
 
-    // ground
     world.add(std::make_shared<Quad>(Point3(-3, -2, 5),
                                      Vec3(0, 0,-4),
                                      Vec3(0, 4, 0),
@@ -164,6 +162,41 @@ void quads() {
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
 
+void simple_lights() {
+    auto world = HittableList();
+
+    world.add(std::make_shared<Sphere>(Point3(0,2,0),
+                                       2,
+                                       std::make_shared<LambertianMaterial>(Color(0.2, 0.2, 1.0))));
+    // ground
+    auto checkeredTexture = std::make_shared<CheckeredTexture>(0.32, Color(1, 1, 1), Color(0.9, 0.1, 0.9));
+    world.add(std::make_shared<Quad>(Point3(-10, 0, -10),
+                                     Vec3(0, 0, 20),
+                                     Vec3(20, 0, 0),
+                                     std::make_shared<LambertianMaterial>(checkeredTexture)));
+
+    // light
+    world.add(std::make_shared<Quad>(Point3(3, 2, -2),
+                                     Vec3(2, 0, 0),
+                                     Vec3(0, 2, 0),
+                                     std::make_shared<DiffuseLightMaterial>(Color(4, 4, 4))));
+    world.add(std::make_shared<Sphere>(Point3(0, 7, 0),
+                                       2,
+                                       std::make_shared<DiffuseLightMaterial>(Color(5, 0, 0))));
+
+    std::clog << "World contains objects: \n"
+              << world
+              << "\n" << std::flush;
+
+    Camera camera = Camera();
+
+    camera.cameraOrigin = Point3(6, 3, 6);
+    camera.cameraTarget = Point3(0, 2, 0);
+    camera.backgroundColor = Color(0, 0, 0);
+
+    camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
+}
+
 //         ^ y
 //         |
 //         |
@@ -173,10 +206,11 @@ void quads() {
 
 int main() {
 
-    switch (3) {
+    switch (4) {
         case 1: random_spheres(); break;
         case 2: two_spheres(); break;
         case 3: quads(); break;
+        case 4: simple_lights(); break;
     }
 
     return 0;

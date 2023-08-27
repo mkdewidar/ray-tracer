@@ -12,6 +12,11 @@ class Material {
         // Given a incoming ray and where it hit on a material, return the scattered ray and attentuation
         // attenuation is how much of the reflection's color should affect the final color
         virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const = 0;
+
+        // returns the color emitted by the material, for most materials, that's black cause they emit no color
+        virtual Color emitted(double const & u, double const & v, Point3 const & point) const {
+            return Color(0, 0, 0);
+        }
 };
 
 // Lambertian diffuse material
@@ -129,6 +134,26 @@ class DielectricMaterial : public Material {
             r0 = r0 * r0;
             return r0 + ((1 - r0) * pow((1 - cosineTheta), 5));
         }
+};
+
+// representation of a diffuse light source
+// note that its ok for this to have a color value greater than 1 as it increases the intensity of the light
+class DiffuseLightMaterial : public Material {
+    public:
+        DiffuseLightMaterial(Color const & lightColor) : DiffuseLightMaterial(std::make_shared<SolidColorTexture>(lightColor)) { }
+
+        DiffuseLightMaterial(std::shared_ptr<Texture> const & emitTexture) : _emittedTexture(emitTexture) { }
+
+        virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const override {
+            return false;
+        }
+
+        virtual Color emitted(double const & u, double const & v, Point3 const & point) const {
+            return this->_emittedTexture->value(u, v, point);
+        }
+
+    private:
+        std::shared_ptr<Texture> _emittedTexture;
 };
 
 #endif

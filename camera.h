@@ -35,6 +35,8 @@ class Camera {
         // Number of reflections/bounces we can make off objects
         int maxDepth = 50;
 
+        Color backgroundColor = Color(0.7, 0.8, 1.0);
+
         void render(std::shared_ptr<Hittable> const & world, void (*postInitialize) (Camera const &), void (*writeColorCallback) (Color const &));
 
     private:
@@ -114,7 +116,7 @@ void Camera::render(std::shared_ptr<Hittable> const & world, void (*postInitiali
 
                 Ray r = get_ray(i, j);
 
-                cumulativeColor = cumulativeColor + ray_color(r, world, maxDepth);
+                cumulativeColor = cumulativeColor + ray_color(r, world, maxDepth, backgroundColor);
             }
 
 
@@ -192,6 +194,8 @@ void Camera::initialize() {
               << "Lower left corner: " << _lowerLeftCorner << "\n";
 
     std::clog << "Samples per pixel: " << aaSamples << "\n";
+
+    std::clog << "Background color: " << backgroundColor << "\n";
 
     std::clog << "\nInitialized...\n\n";
 }
