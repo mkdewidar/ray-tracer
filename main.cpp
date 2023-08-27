@@ -197,6 +197,55 @@ void simple_lights() {
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
 
+void cornell_box() {
+    auto world = HittableList();
+
+    auto red   = std::make_shared<LambertianMaterial>(Color(0.65, 0.05, 0.05));
+    auto white = std::make_shared<LambertianMaterial>(Color(0.73, 0.73, 0.73));
+    auto green = std::make_shared<LambertianMaterial>(Color(0.12, 0.45, 0.15));
+    auto light = std::make_shared<DiffuseLightMaterial>(Color(15, 15, 15));
+
+    world.add(std::make_shared<Quad>(Point3(555, 0, 0),
+                                     Vec3(0, 555, 0),
+                                     Vec3(0, 0, 555),
+                                     green));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0),
+                                     Vec3(0, 555, 0),
+                                     Vec3(0, 0, 555),
+                                     red));
+    world.add(std::make_shared<Quad>(Point3(343, 554, 332),
+                                     Vec3(-130, 0, 0),
+                                     Vec3(0, 0, -105),
+                                     light));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0),
+                                     Vec3(555, 0, 0),
+                                     Vec3(0, 0, 555),
+                                     white));
+    world.add(std::make_shared<Quad>(Point3(555, 555, 555),
+                                     Vec3(-555, 0, 0),
+                                     Vec3(0, 0, -555),
+                                     white));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 555),
+                                     Vec3(555, 0, 0),
+                                     Vec3(0, 555, 0),
+                                     white));
+
+    std::clog << "World contains objects: \n"
+              << world
+              << "\n" << std::flush;
+
+    Camera camera = Camera();
+
+    camera.aspectRatio = 1.0;
+    camera.imageWidth = 600;
+    camera.fieldOfView = 40;
+    camera.cameraOrigin = Point3(278, 278, -800);
+    camera.cameraTarget = Point3(278, 278, 0);
+    camera.backgroundColor = Color(0, 0, 0);
+
+    camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
+}
+
 //         ^ y
 //         |
 //         |
@@ -206,11 +255,12 @@ void simple_lights() {
 
 int main() {
 
-    switch (4) {
+    switch (5) {
         case 1: random_spheres(); break;
         case 2: two_spheres(); break;
         case 3: quads(); break;
         case 4: simple_lights(); break;
+        case 5: cornell_box(); break;
     }
 
     return 0;
