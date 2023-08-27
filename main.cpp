@@ -27,15 +27,7 @@ void post_initialize(Camera const & camera) {
     std::cout << "P3\n" << camera.imageWidth << " " << camera.imageHeight << "\n255\n";
 }
 
-//         ^ y
-//         |
-//         |
-//        /---> x
-//       /
-//      z (i.e positive z is out of the screen towards you)
-
-int main() {
-    auto world = HittableList();
+void random_spheres(HittableList & world) {
 
     // ground
     auto groundTexture = std::make_shared<CheckeredTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
@@ -93,6 +85,34 @@ int main() {
     world.add(std::make_shared<Sphere>(Vec3(4, 1, 0),
                                        1,
                                        std::make_shared<MetalMaterial>(Color(0.7, 0.6, 0.5), 0)));
+}
+
+void two_spheres(HittableList & world) {
+
+    // ground
+    auto groundTexture = std::make_shared<CheckeredTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
+    world.add(std::make_shared<Sphere>(Point3(0, -10, 0),
+                                       10,
+                                       std::make_shared<LambertianMaterial>(groundTexture)));
+    world.add(std::make_shared<Sphere>(Point3(0, 10, 0),
+                                       10,
+                                       std::make_shared<LambertianMaterial>(groundTexture)));
+}
+
+//         ^ y
+//         |
+//         |
+//        /---> x
+//       /
+//      z (i.e positive z is out of the screen towards you)
+
+int main() {
+    auto world = HittableList();
+
+    switch (2) {
+        case 1: random_spheres(world); break;
+        case 2: two_spheres(world); break;
+    }
 
     std::clog << "World contains objects: \n"
               << world
