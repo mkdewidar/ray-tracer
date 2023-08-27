@@ -3,6 +3,7 @@
 
 #include "color.h"
 #include "logger.h"
+#include "texture.h"
 
 class HitResult;
 
@@ -20,7 +21,8 @@ class Material {
 // we just always reflect.
 class LambertianMaterial : public Material {
     public:
-        LambertianMaterial(Color const & a) : albedo(a) { }
+        LambertianMaterial(Color const & a) : albedo(std::make_shared<SolidColorTexture>(a)) { }
+        LambertianMaterial(std::shared_ptr<Texture> const & t) : albedo(t) { }
 
         virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const override {
             // we're imagining that there is a sphere where the normal vector is
@@ -47,13 +49,13 @@ class LambertianMaterial : public Material {
             // auto reflectedRay = Ray(result.point, random_in_hemisphere(result.normal));
 
             scatteredRay = Ray(result.point, reflectedRayDirection, incomingRay.time);
-            attenuation = this->albedo;
+            attenuation = this->albedo->value(result.u, result.v, result.point);
 
             return true;
         }
 
     public:
-        Color albedo;
+        std::shared_ptr<Texture> albedo;
 };
 
 // Shiny metallic material implementation that relies on modelling the ray reflecting across the surface normal.

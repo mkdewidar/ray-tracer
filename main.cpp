@@ -8,6 +8,7 @@
 #include "ray.h"
 
 #include "hittable.h"
+#include "texture.h"
 #include "material.h"
 #include "sphere.h"
 #include "hittable_list.h"
@@ -37,9 +38,10 @@ int main() {
     auto world = HittableList();
 
     // ground
+    auto groundTexture = std::make_shared<CheckeredTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
     world.add(std::make_shared<Sphere>(Point3(0.0, -1000, 0),
                                        1000,
-                                       std::make_shared<LambertianMaterial>(Color(0.5, 0.5, 0.5))));
+                                       std::make_shared<LambertianMaterial>(groundTexture)));
 
     for (int x = -11; x < 11; x++) {
         for (int z = -11; z < 11; z++) {

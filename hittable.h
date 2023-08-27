@@ -18,6 +18,9 @@ class HitResult {
         std::shared_ptr<Material> material;
         // the scalar that if you multiply by the ray takes you to the point at which the intersection occurred
         double t = -1.0;
+        // texture coordinates
+        double u;
+        double v;
 
         void set_face_normal(Ray const & ray, Vec3 const & normal);
 };
