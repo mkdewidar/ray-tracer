@@ -23,7 +23,7 @@ class Ray {
 #include "hittable.h"
 #include "material.h"
 
-Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects, int depth);
+Color ray_color(Ray const & ray, Hittable const & world, int depth);
 
 // ------
 
@@ -36,7 +36,7 @@ Vec3 Ray::at(double const t) const {
 }
 
 // shoot the ray into the world of objects, and find the color that would be seen from the source of the ray
-Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & objects, int depth) {
+Color ray_color(Ray const & ray, Hittable const & world, int depth) {
 
     LOG(
         std::clog << "Bounce number " << depth << "\n";
@@ -50,43 +50,21 @@ Color ray_color(Ray const & ray, std::vector<std::unique_ptr<Hittable>> & object
 
     double maxRayLength = std::numeric_limits<double>::infinity(); // essentially our view distance
 
-    bool didHitAnything = false;
-
     auto hitResult = HitResult();
-
-    // for use inside the loop as an output parameter to the hit function
-    auto tmpHitResult = HitResult();
 
     LOG(
         std::clog << "Ray: " << ray.dir << "\n";
     )
 
-    for (std::unique_ptr<Hittable> const & object : objects) {
-
-        // the 0.00001 is a workaround for fixing "shadow acne"
-        // it essentially makes it so that if we collide with something really close, then we ignore it as it might've
-        // been a result of a rounding error during the previous collision calculation
-        if (object->hit(ray, Interval(0.00001, maxRayLength), tmpHitResult)) {
-            hitResult = tmpHitResult;
-
-            // the t for object becomes our new max length of the ray
-            // allowing us to ensure we pick the color of objects that are closest to us
-            maxRayLength = hitResult.t;
-
-            didHitAnything = true;
-            LOG(
-                std::clog << "Ray hit object " << object << " with t = " << hitResult.t << ", front face: " << hitResult.isFrontFace << "\n";
-                std::clog << "Normal: " << hitResult.normal.x << " " << hitResult.normal.y << " " << hitResult.normal.z << "\n";
-            )
-        }
-    }
-
-    if (didHitAnything) {
+    // the 0.00001 is a workaround for fixing "shadow acne"
+    // it essentially makes it so that if we collide with something really close, then we ignore it as it might've
+    // been a result of a rounding error during the previous collision calculation
+    if (world.hit(ray, Interval(0.00001, maxRayLength), hitResult)) {
         Ray scatteredRay;
         Color attenuation;
 
         if (hitResult.material->scatter(ray, hitResult, attenuation, scatteredRay))
-            return attenuation * ray_color(scatteredRay, objects, depth - 1);
+            return attenuation * ray_color(scatteredRay, world, depth - 1);
         else {
             return Color(0,0,0);
         }

@@ -11,6 +11,7 @@
 #include "hittable.h"
 #include "material.h"
 #include "sphere.h"
+#include "hittable_list.h"
 
 #include "camera.h"
 
@@ -32,12 +33,12 @@ void post_initialize(Camera const & camera) {
 //      z (i.e positive z is out of the screen towards you)
 
 int main() {
-    auto objects = std::vector<std::unique_ptr<Hittable>>();
+    auto world = HittableList();
 
     // ground
-    objects.push_back(std::make_unique<Sphere>(Point3(0.0, -1000, 0),
-                                               1000,
-                                               std::make_shared<LambertianMaterial>(Color(0.5, 0.5, 0.5))));
+    world.add(std::make_shared<Sphere>(Point3(0.0, -1000, 0),
+                                       1000,
+                                       std::make_shared<LambertianMaterial>(Color(0.5, 0.5, 0.5))));
 
     for (int x = -11; x < 11; x++) {
         for (int z = -11; z < 11; z++) {
@@ -58,50 +59,48 @@ int main() {
                     randomizedMaterial = std::make_shared<DielectricMaterial>(1.5);
                 }
 
-                objects.push_back(std::make_unique<Sphere>(sphereCenter,
-                                                           sphereCenter + Point3(0, random_double(0, 0.5), 0),
-                                                           0.2,
-                                                           randomizedMaterial));
+                world.add(std::make_shared<Sphere>(sphereCenter,
+                                                   sphereCenter + Point3(0, random_double(0, 0.5), 0),
+                                                   0.2,
+                                                   randomizedMaterial));
             }
         }
     }
 
     // dielectric bubble
     // two dielectrics inside each other, with the one inside being "inside out"
-    objects.push_back(std::make_unique<Sphere>(Point3(-8, 1, 0),
-                                               1,
-                                               std::make_shared<DielectricMaterial>(1.5)));
-    objects.push_back(std::make_unique<Sphere>(Point3(-8, 1, 0),
-                                               -0.95,
-                                               std::make_shared<DielectricMaterial>(1.5)));
+    world.add(std::make_shared<Sphere>(Point3(-8, 1, 0),
+                                       1,
+                                       std::make_shared<DielectricMaterial>(1.5)));
+    world.add(std::make_shared<Sphere>(Point3(-8, 1, 0),
+                                       -0.95,
+                                       std::make_shared<DielectricMaterial>(1.5)));
 
     // diffuse
-    objects.push_back(std::make_unique<Sphere>(Point3(-4, 1, 0),
-                                               1,
-                                               std::make_shared<LambertianMaterial>(Color(0.4, 0.2, 0.1))));
+    world.add(std::make_shared<Sphere>(Point3(-4, 1, 0),
+                                       1,
+                                       std::make_shared<LambertianMaterial>(Color(0.4, 0.2, 0.1))));
 
     // dielectric
-    objects.push_back(std::make_unique<Sphere>(Point3(0, 1, 0),
-                                               1,
-                                               std::make_shared<DielectricMaterial>(1.5)));
+    world.add(std::make_shared<Sphere>(Point3(0, 1, 0),
+                                       1,
+                                       std::make_shared<DielectricMaterial>(1.5)));
 
     // metallic
-    objects.push_back(std::make_unique<Sphere>(Vec3(4, 1, 0),
-                                               1,
-                                               std::make_shared<MetalMaterial>(Color(0.7, 0.6, 0.5), 0)));
+    world.add(std::make_shared<Sphere>(Vec3(4, 1, 0),
+                                       1,
+                                       std::make_shared<MetalMaterial>(Color(0.7, 0.6, 0.5), 0)));
 
-    std::clog << "World contains objects: \n";
-    for (auto & obj : objects) {
-        std::clog << "- " << obj << "\n";
-    }
-    std::clog << "\n" << std::flush;
+    std::clog << "World contains objects: \n"
+              << world
+              << "\n" << std::flush;
 
     Camera camera = Camera();
 
     camera.cameraOrigin = Point3(7, 2, 6);
     camera.cameraTarget = Point3(0, 0, 0);
 
-    camera.render(objects, post_initialize, write_ppm_color);
+    camera.render(world, post_initialize, write_ppm_color);
 
     return 0;
 }

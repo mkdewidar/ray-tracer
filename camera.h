@@ -37,7 +37,7 @@ class Camera {
         // Number of reflections/bounces we can make off objects
         int maxDepth = 50;
 
-        void render(std::vector<std::unique_ptr<Hittable>> & world, void (*postInitialize) (Camera const &), void (*writeColorCallback) (Color const &));
+        void render(Hittable const & world, void (*postInitialize) (Camera const &), void (*writeColorCallback) (Color const &));
 
     private:
         // u, v, w are camera axis, which are different from the world axis if the camera is rotated
@@ -79,7 +79,7 @@ class Camera {
 
 // ------
 
-void Camera::render(std::vector<std::unique_ptr<Hittable>> & world, void (*postInitialize) (Camera const &), void (*writeColorCallback) (Color const &)) {
+void Camera::render(Hittable const & world, void (*postInitialize) (Camera const &), void (*writeColorCallback) (Color const &)) {
     initialize();
 
     postInitialize(*this);
