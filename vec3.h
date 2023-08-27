@@ -4,6 +4,8 @@
 #include <cmath>
 #include <ostream>
 
+double const PI = 3.1415926535897932385;
+
 class Vec3 {
     public:
         double x;

@@ -6,8 +6,6 @@
 #include "logger.h"
 #include "ray.h"
 
-double const PI = 3.1415926535897932385;
-
 class Camera {
     public:
         double aspectRatio = 16.0 / 9.0;

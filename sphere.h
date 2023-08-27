@@ -99,8 +99,12 @@ bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result
         if (rayLimits.contains(root)) {
             result.t = root;
             result.point = ray.at(result.t);
-            result.set_face_normal(ray, (result.point - currentCenter) / this->radius);
+
+            Vec3 outwardNormal = (result.point - currentCenter) / this->radius;
+            result.set_face_normal(ray, outwardNormal);
             result.material = this->material;
+            result.u = (atan2(-outwardNormal.z, outwardNormal.x) + PI) / (2 * PI);
+            result.v = acos(-outwardNormal.y) / PI;
 
             LOG(
                 std::clog << "Using first root" << "\n";
@@ -117,8 +121,12 @@ bool Sphere::hit(Ray const & ray, Interval const & rayLimits, HitResult & result
         if (rayLimits.contains(root)) {
             result.t = root;
             result.point = ray.at(result.t);
-            result.set_face_normal(ray, (result.point - currentCenter) / this->radius);
+
+            Vec3 outwardNormal = (result.point - currentCenter) / this->radius;
+            result.set_face_normal(ray, outwardNormal);
             result.material = this->material;
+            result.u = (atan2(-outwardNormal.z, outwardNormal.x) + PI) / (2 * PI);
+            result.v = acos(-outwardNormal.y) / PI;
 
             LOG(
                 std::clog << "Using second root" << "\n";
