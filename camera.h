@@ -190,6 +190,8 @@ void Camera::initialize() {
               << "Vertical vector: " << _vertical << "\n"
               << "Lower left corner: " << _lowerLeftCorner << "\n";
 
+    std::clog << "Samples per pixel: " << aaSamples << "\n";
+
     std::clog << "\nInitialized...\n\n";
 }
 
