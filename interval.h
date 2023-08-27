@@ -20,6 +20,12 @@ class Interval {
 
         double clamp(double x) const;
 
+        double size() const;
+
+        // returns a new interval that's been expanded by a certain amount overall
+        // (i.e half of whats provided in each direction)
+        Interval expand(double amount) const;
+
         static Interval const empty, universe;
 };
 
@@ -50,6 +56,15 @@ double Interval::clamp(double x) const {
     if (x < min) return min;
     if (x > max) return max;
     return x;
+}
+
+double Interval::size() const {
+    return this->max - this->min;
+}
+
+Interval Interval::expand(double amount) const {
+    auto halfAmount = amount / 2;
+    return Interval(this->min - halfAmount, this->max + halfAmount);
 }
 
 #endif

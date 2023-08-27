@@ -108,6 +108,9 @@ void Camera::render(std::shared_ptr<Hittable> const & world, void (*postInitiali
             // of color and average them all to get the color for this pixel
             Color cumulativeColor = Color(0, 0, 0);
             for (int s = 0; s < aaSamples; ++s) {
+                LOG(
+                    std::clog << "Pixel sample " << s << "\n";
+                )
 
                 Ray r = get_ray(i, j);
 

@@ -9,18 +9,26 @@
 // this AABB is defined by 3 intervals along the three axis, figuring out whether a ray intersects
 // with it is therefore as simple as checking that the ray's various components (x, y, z) intersect with
 // all three of the intervals.
+// AABB should not be zero in any particular dimension, use the pad() function to avoid that
 class Aabb {
     public:
         Interval xBounds, yBounds, zBounds;
 
         Aabb();
         Aabb(Interval const & xInterval, Interval const & yInterval, Interval const & zInterval);
-        // for creating AABB that encloses these two points
+        // for creating AABB that encloses these two points,
+        // it doesn't matter the relative position of the two from each other
         Aabb(Point3 const & a, Point3 const & b);
-        // for creating AABB that encloses these two other AABB entirely
+        // for creating AABB that encloses these two other AABB entirely,
+        // it doesn't matter the relative position of the two from each other
         Aabb(Aabb const & a, Aabb const & b);
 
         bool hit(Ray const & incomingRay, Interval rayLimits) const;
+
+        // returns a new slightly bigger AABB that's confirmed to be at least a certain size in all dimensions
+        // helps in cases where the AABB is encompassing something with 0 in one axis
+        Aabb pad(double atLeastSize = 0.0001);
+
     private:
         bool intersect_with_bounds(Interval const & componentBounds, double const rayDirectionComponent,
                                    double const rayOriginComponent, Interval & rayLimits) const;
@@ -60,6 +68,12 @@ bool Aabb::hit(Ray const & incomingRay, Interval rayLimits) const {
     return intersect_with_bounds(xBounds, incomingRay.dir.x, incomingRay.orig.x, rayLimits) &&
            intersect_with_bounds(yBounds, incomingRay.dir.y, incomingRay.orig.y, rayLimits) &&
            intersect_with_bounds(zBounds, incomingRay.dir.z, incomingRay.orig.z, rayLimits);
+}
+
+Aabb Aabb::pad(double atLeastSize) {
+    return Aabb((this->xBounds.size() <= atLeastSize) ? this->xBounds.expand(0.0001) : this->xBounds,
+                (this->yBounds.size() <= atLeastSize) ? this->yBounds.expand(0.0001) : this->yBounds,
+                (this->zBounds.size() <= atLeastSize) ? this->zBounds.expand(0.0001) : this->zBounds);
 }
 
 bool Aabb::intersect_with_bounds(Interval const & componentBounds, double const rayDirectionComponent,

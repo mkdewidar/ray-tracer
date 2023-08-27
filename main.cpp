@@ -14,6 +14,7 @@
 #include "hittable_list.h"
 #include "aabb.h"
 #include "bvh_node.h"
+#include "quad.h"
 
 #include "camera.h"
 
@@ -123,6 +124,46 @@ void two_spheres() {
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
 
+
+void quads() {
+    auto world = HittableList();
+
+    // ground
+    world.add(std::make_shared<Quad>(Point3(-3, -2, 5),
+                                     Vec3(0, 0,-4),
+                                     Vec3(0, 4, 0),
+                                     std::make_shared<LambertianMaterial>(Color(1.0, 0.2, 0.2))));
+    world.add(std::make_shared<Quad>(Point3(-2, -2, 0),
+                                     Vec3(4, 0, 0),
+                                     Vec3(0, 4, 0),
+                                     std::make_shared<LambertianMaterial>(Color(0.2, 1.0, 0.2))));
+    world.add(std::make_shared<Quad>(Point3(3, -2, 1),
+                                     Vec3(0, 0, 4),
+                                     Vec3(0, 4, 0),
+                                     std::make_shared<LambertianMaterial>(Color(0.2, 0.2, 1.0))));
+    world.add(std::make_shared<Quad>(Point3(-2, 3, 1),
+                                     Vec3(4, 0, 0),
+                                     Vec3(0, 0, 4),
+                                     std::make_shared<LambertianMaterial>(Color(1.0, 0.5, 0.0))));
+    world.add(std::make_shared<Quad>(Point3(-2, -3, 5),
+                                     Vec3(4, 0, 0),
+                                     Vec3(0, 0, -4),
+                                     std::make_shared<LambertianMaterial>(Color(0.2, 0.8, 0.8))));
+
+    std::clog << "World contains objects: \n"
+              << world
+              << "\n" << std::flush;
+
+    Camera camera = Camera();
+
+    camera.aspectRatio = 1.0;
+    camera.imageWidth = 500;
+    camera.cameraOrigin = Point3(0, 0, 9);
+    camera.cameraTarget = Point3(0, 0, 0);
+
+    camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
+}
+
 //         ^ y
 //         |
 //         |
@@ -132,9 +173,10 @@ void two_spheres() {
 
 int main() {
 
-    switch (1) {
+    switch (3) {
         case 1: random_spheres(); break;
         case 2: two_spheres(); break;
+        case 3: quads(); break;
     }
 
     return 0;
