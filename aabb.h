@@ -65,9 +65,18 @@ bool Aabb::hit(Ray const & incomingRay, Interval rayLimits) const {
     //     the ray is parallel to the bound: there is no t
     // NOTE: rayLimits is modified by all these functions to include the new closest and furthest intersection
     //     t values of the ray
-    return intersect_with_bounds(xBounds, incomingRay.dir.x, incomingRay.orig.x, rayLimits) &&
-           intersect_with_bounds(yBounds, incomingRay.dir.y, incomingRay.orig.y, rayLimits) &&
-           intersect_with_bounds(zBounds, incomingRay.dir.z, incomingRay.orig.z, rayLimits);
+
+    bool intersectedAlongX = intersect_with_bounds(xBounds, incomingRay.dir.x, incomingRay.orig.x, rayLimits);
+    bool intersectedAlongY = intersectedAlongX && intersect_with_bounds(yBounds, incomingRay.dir.y, incomingRay.orig.y, rayLimits);
+    bool intersectedAlongZ = intersectedAlongY && intersect_with_bounds(zBounds, incomingRay.dir.z, incomingRay.orig.z, rayLimits);
+
+    LOG(
+        std::clog << "Ray intersected with AABB along x: " << intersectedAlongX
+                  << ", y: " << intersectedAlongY
+                  << ", z: " << intersectedAlongZ << "\n";
+    );
+
+    return intersectedAlongX && intersectedAlongY && intersectedAlongZ;
 }
 
 Aabb Aabb::pad(double atLeastSize) {
@@ -85,6 +94,11 @@ bool Aabb::intersect_with_bounds(Interval const & componentBounds, double const 
 
     // the t for the intersection with the upper bound
     auto t1 = (componentBounds.max - rayOriginComponent) * invD;
+
+    LOG(
+        std::clog << "Checking ray intersection with bounds, t0: " << t0 << ", t1: " << t1
+                  << ", rayLimits: " << rayLimits.min << " " << rayLimits.max << "\n";
+    );
 
     if (invD < 0)
         std::swap(t0, t1);
