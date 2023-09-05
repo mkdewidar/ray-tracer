@@ -16,6 +16,7 @@
 #include "bvh_node.h"
 #include "quad.h"
 #include "constant_medium.h"
+#include "transformer.h"
 
 #include "camera.h"
 
@@ -233,8 +234,10 @@ void cornell_box() {
                                      white));
 
     // boxes
-    world.add(make_box(Point3(130, 0, 65), Point3(295, 165, 230), white));
-    world.add(make_box(Point3(265, 0, 295), Point3(430, 330, 460), white));
+    world.add(std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 330, 165), white),
+                                                     Vec3(265, 0, 295)));
+    world.add(std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 165, 165), white),
+                                                     Vec3(130, 0, 65)));
 
     std::clog << "World contains objects: \n"
               << world
@@ -288,12 +291,12 @@ void cornell_smoke() {
                                      white));
 
     // boxes
-    world.add(std::make_shared<ConstantMedium>(make_box(Point3(265, 0, 295), Point3(430, 330, 460), white),
-                                               0.01,
-                                               Color(0, 0, 0)));
-    world.add(std::make_shared<ConstantMedium>(make_box(Point3(130, 0, 65), Point3(295, 165, 230), white),
-                                               0.01,
-                                               Color(1, 1, 1)));
+    auto box1 = std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 330, 165), white),
+                                                       Vec3(265, 0, 295));
+    auto box2 = std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 165, 165), white),
+                                                       Vec3(130, 0, 65));
+    world.add(std::make_shared<ConstantMedium>(box1, 0.01, Color(0, 0, 0)));
+    world.add(std::make_shared<ConstantMedium>(box2, 0.01, Color(1, 1, 1)));
 
     std::clog << "World contains objects: \n"
               << world

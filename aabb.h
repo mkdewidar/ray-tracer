@@ -29,10 +29,14 @@ class Aabb {
         // helps in cases where the AABB is encompassing something with 0 in one axis
         Aabb pad(double atLeastSize = 0.0001);
 
+        Aabb operator+(Vec3 & right);
+
     private:
         bool intersect_with_bounds(Interval const & componentBounds, double const rayDirectionComponent,
                                    double const rayOriginComponent, Interval & rayLimits) const;
 };
+
+Aabb operator+(Vec3 & left, Aabb & right);
 
 Aabb::Aabb() : xBounds(), yBounds(), zBounds() { }
 
@@ -112,6 +116,14 @@ bool Aabb::intersect_with_bounds(Interval const & componentBounds, double const 
         return false;
 
     return true;
+}
+
+Aabb Aabb::operator+(Vec3 & right) {
+    return Aabb(this->xBounds + right.x, this->yBounds + right.y, this->zBounds + right.z);
+}
+
+Aabb operator+(Vec3 & left, Aabb & right) {
+    return right + left;
 }
 
 #endif

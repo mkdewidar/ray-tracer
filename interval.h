@@ -26,8 +26,12 @@ class Interval {
         // (i.e half of whats provided in each direction)
         Interval expand(double amount) const;
 
+        Interval operator+(double right);
+
         static Interval const empty, universe;
 };
+
+Interval operator+(double left, Interval const & right);
 
 // ------
 
@@ -65,6 +69,14 @@ double Interval::size() const {
 Interval Interval::expand(double amount) const {
     auto halfAmount = amount / 2;
     return Interval(this->min - halfAmount, this->max + halfAmount);
+}
+
+Interval Interval::operator+(double right) {
+    return Interval(this->min + right, this->max + right);
+}
+
+Interval operator+(double left, Interval & right) {
+    return right + left;
 }
 
 #endif
