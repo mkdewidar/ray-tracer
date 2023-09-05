@@ -156,4 +156,19 @@ class DiffuseLightMaterial : public Material {
         std::shared_ptr<Texture> _emittedTexture;
 };
 
+// a material that scatters light in any random direction, used primarily to implement fog
+class IsotropicScatterMaterial : public Material {
+    public:
+        IsotropicScatterMaterial(std::shared_ptr<Texture> const & texture) : _albedo(texture) { }
+
+        virtual bool scatter(Ray const & incomingRay, HitResult const & result, Color & attenuation, Ray & scatteredRay) const override {
+            scatteredRay = Ray(result.point, random_unit_vec3(), incomingRay.time);
+            attenuation = this->_albedo->value(result.u, result.v, result.point);
+
+            return true;
+        }
+    private:
+        std::shared_ptr<Texture> _albedo;
+};
+
 #endif

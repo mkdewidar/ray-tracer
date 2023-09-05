@@ -15,6 +15,7 @@
 #include "aabb.h"
 #include "bvh_node.h"
 #include "quad.h"
+#include "constant_medium.h"
 
 #include "camera.h"
 
@@ -252,6 +253,67 @@ void cornell_box() {
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
 
+void cornell_smoke() {
+    auto world = HittableList();
+
+    auto red   = std::make_shared<LambertianMaterial>(Color(0.65, 0.05, 0.05));
+    auto white = std::make_shared<LambertianMaterial>(Color(0.73, 0.73, 0.73));
+    auto green = std::make_shared<LambertianMaterial>(Color(0.12, 0.45, 0.15));
+    auto light = std::make_shared<DiffuseLightMaterial>(Color(7, 7, 7));
+
+    // walls
+    world.add(std::make_shared<Quad>(Point3(555, 0, 0),
+                                     Vec3(0, 555, 0),
+                                     Vec3(0, 0, 555),
+                                     green));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0),
+                                     Vec3(0, 555, 0),
+                                     Vec3(0, 0, 555),
+                                     red));
+    world.add(std::make_shared<Quad>(Point3(113, 554, 127),
+                                     Vec3(330, 0, 0),
+                                     Vec3(0, 0, 305),
+                                     light));
+    world.add(std::make_shared<Quad>(Point3(0, 555, 0),
+                                     Vec3(555, 0, 0),
+                                     Vec3(0, 0, 555),
+                                     white));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 0),
+                                     Vec3(555, 0, 0),
+                                     Vec3(0, 0, 555),
+                                     white));
+    world.add(std::make_shared<Quad>(Point3(0, 0, 555),
+                                     Vec3(555, 0, 0),
+                                     Vec3(0, 555, 0),
+                                     white));
+
+    // boxes
+    world.add(std::make_shared<ConstantMedium>(make_box(Point3(265, 0, 295), Point3(430, 330, 460), white),
+                                               0.01,
+                                               Color(0, 0, 0)));
+    world.add(std::make_shared<ConstantMedium>(make_box(Point3(130, 0, 65), Point3(295, 165, 230), white),
+                                               0.01,
+                                               Color(1, 1, 1)));
+
+    std::clog << "World contains objects: \n"
+              << world
+              << "\n" << std::flush;
+
+    std::clog << "Universe: " << Interval::universe.min << ", " << Interval::universe.max << "\n";
+
+    Camera camera = Camera();
+
+    camera.aspectRatio = 1.0;
+    camera.imageWidth = 600;
+    camera.fieldOfView = 40;
+    camera.cameraOrigin = Point3(278, 278, -800);
+    camera.cameraTarget = Point3(278, 278, 0);
+    camera.aaSamples = 50;
+    camera.backgroundColor = Color(0, 0, 0);
+
+    camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
+}
+
 //         ^ y
 //         |
 //         |
@@ -261,12 +323,13 @@ void cornell_box() {
 
 int main() {
 
-    switch (5) {
+    switch (6) {
         case 1: random_spheres(); break;
         case 2: two_spheres(); break;
         case 3: quads(); break;
         case 4: simple_lights(); break;
         case 5: cornell_box(); break;
+        case 6: cornell_smoke(); break;
     }
 
     return 0;
