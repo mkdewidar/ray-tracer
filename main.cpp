@@ -234,10 +234,15 @@ void cornell_box() {
                                      white));
 
     // boxes
-    world.add(std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 330, 165), white),
-                                                     Vec3(265, 0, 295)));
-    world.add(std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 165, 165), white),
-                                                     Vec3(130, 0, 65)));
+    std::shared_ptr<Hittable> box1 = make_box(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<RotateYTransformer>(box1, 15);
+    box1 = std::make_shared<TranslateTransformer>(box1, Vec3(265, 0, 295));
+    world.add(box1);
+
+    std::shared_ptr<Hittable> box2 = make_box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<RotateYTransformer>(box2, -18);
+    box2 = std::make_shared<TranslateTransformer>(box2, Vec3(130, 0, 65));
+    world.add(box2);
 
     std::clog << "World contains objects: \n"
               << world
@@ -291,11 +296,14 @@ void cornell_smoke() {
                                      white));
 
     // boxes
-    auto box1 = std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 330, 165), white),
-                                                       Vec3(265, 0, 295));
-    auto box2 = std::make_shared<TranslateTransformer>(make_box(Point3(0, 0, 0), Point3(165, 165, 165), white),
-                                                       Vec3(130, 0, 65));
+    std::shared_ptr<Hittable> box1 = make_box(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<RotateYTransformer>(box1, 15);
+    box1 = std::make_shared<TranslateTransformer>(box1, Vec3(265, 0, 295));
     world.add(std::make_shared<ConstantMedium>(box1, 0.01, Color(0, 0, 0)));
+
+    std::shared_ptr<Hittable> box2 = make_box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<RotateYTransformer>(box2, -18);
+    box2 = std::make_shared<TranslateTransformer>(box2, Vec3(130, 0, 65));
     world.add(std::make_shared<ConstantMedium>(box2, 0.01, Color(1, 1, 1)));
 
     std::clog << "World contains objects: \n"
