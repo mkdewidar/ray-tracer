@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <stdlib.h>
 
 #include "vec3.h"
 #include "color.h"
@@ -98,6 +99,27 @@ void random_spheres() {
 
     camera.cameraOrigin = Point3(7, 2, 6);
     camera.cameraTarget = Point3(0, 0, 0);
+
+    camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
+}
+
+void checkered_spheres() {
+    auto world = HittableList();
+
+    auto groundTexture = std::make_shared<CheckeredTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
+    world.add(std::make_shared<Sphere>(Point3(0, -10, 0),
+                                       10,
+                                       std::make_shared<LambertianMaterial>(groundTexture)));
+    world.add(std::make_shared<Sphere>(Point3(0, 10, 0),
+                                       10,
+                                       std::make_shared<LambertianMaterial>(groundTexture)));
+
+    Camera camera = Camera();
+
+    camera.cameraOrigin = Point3(13, 2, 3);
+    camera.cameraTarget = Point3(0, 0, 0);
+    camera.fieldOfView = 20;
+    camera.imageWidth = 400;
 
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
@@ -332,15 +354,23 @@ void cornell_smoke() {
 //       /
 //      z (i.e positive z is out of the screen towards you)
 
-int main() {
+int main(int argc, char** argv) {
 
-    switch (6) {
+    int scene = 1;
+
+    if (argc > 1) {
+        scene = atoi(argv[1]);
+    }
+
+    switch (scene) {
         case 1: random_spheres(); break;
-        case 2: two_spheres(); break;
-        case 3: quads(); break;
-        case 4: simple_lights(); break;
-        case 5: cornell_box(); break;
-        case 6: cornell_smoke(); break;
+        case 2: checkered_spheres(); break;
+        case 3: two_spheres(); break;
+        case 4: quads(); break;
+        case 5: simple_lights(); break;
+        case 6: cornell_box(); break;
+        case 7: cornell_smoke(); break;
+        default: std::cerr << "No scene selected, not producing any output" << std::endl;
     }
 
     return 0;
