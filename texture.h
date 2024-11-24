@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include "color.h"
+#include "image.h"
 
 class Texture {
     public:
@@ -34,6 +35,15 @@ class CheckeredTexture : public Texture {
         std::shared_ptr<Texture> _evenPatternTexture;
 };
 
+class ImageTexture : public Texture {
+    public:
+        ImageTexture(std::string const & filename);
+
+        Color value(double u, double v, Point3 const & p) const override;
+    private:
+        Image image;
+};
+
 // ------
 
 SolidColorTexture::SolidColorTexture(Color c) : _color(c) { }
@@ -61,6 +71,18 @@ Color CheckeredTexture::value(double u, double v, Point3 const & p) const {
     auto isEven = ((x + y + z) % 2) == 0;
 
     return isEven ? _evenPatternTexture->value(u, v, p) : _oddPatternTexture->value(u, v, p);
+}
+
+
+ImageTexture::ImageTexture(std::string const & filename)
+                                   : image(filename) { }
+
+Color ImageTexture::value(double u, double v, Point3 const & p) const {
+    u = Interval(0, 1).clamp(u);
+    v = 1.0 - Interval(0, 1).clamp(v); // flip v because image is mapped from top to bottom
+
+    double * const pixel = this->image.color_at(int(u * this->image.width), int(v * this->image.height));
+    return Color(pixel[0], pixel[1], pixel[2]);
 }
 
 #endif

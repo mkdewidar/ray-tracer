@@ -124,6 +124,22 @@ void checkered_spheres() {
     camera.render(std::make_shared<BvhNode>(world), post_initialize, write_ppm_color);
 }
 
+void earth() {
+    auto earthGlobe = std::make_shared<Sphere>(Point3(0, 0, 0),
+                                               2,
+                                               std::make_shared<LambertianMaterial>(
+                                                    std::make_shared<ImageTexture>("./earthmap.jpg")));
+
+    Camera camera = Camera();
+
+    camera.cameraOrigin = Point3(0, 0, 12);
+    camera.cameraTarget = Point3(0, 0, 0);
+    camera.fieldOfView = 20;
+    camera.imageWidth = 600;
+
+    camera.render(std::make_shared<HittableList>(earthGlobe), post_initialize, write_ppm_color);
+}
+
 void two_spheres() {
     auto world = HittableList();
 
@@ -365,11 +381,12 @@ int main(int argc, char** argv) {
     switch (scene) {
         case 1: random_spheres(); break;
         case 2: checkered_spheres(); break;
-        case 3: two_spheres(); break;
-        case 4: quads(); break;
-        case 5: simple_lights(); break;
-        case 6: cornell_box(); break;
-        case 7: cornell_smoke(); break;
+        case 3: earth(); break;
+        case 4: two_spheres(); break;
+        case 5: quads(); break;
+        case 6: simple_lights(); break;
+        case 7: cornell_box(); break;
+        case 8: cornell_smoke(); break;
         default: std::cerr << "No scene selected, not producing any output" << std::endl;
     }
 
